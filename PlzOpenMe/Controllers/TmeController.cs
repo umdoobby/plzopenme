@@ -36,7 +36,7 @@ namespace PlzOpenMe.Controllers
         // Telegram Webhook Uri
         [HttpPost]
         [Consumes("application/json")]
-        public IActionResult Hook_NUUKe7vFH5()
+        public IActionResult Hook_SecretHookAddress()
         {
             // create a memory stream and read the request into it
             MemoryStream ms = new MemoryStream();

@@ -23,7 +23,7 @@ namespace PlzOpenMe.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("Database context is not configured.");
             }
         }
 
@@ -34,52 +34,23 @@ namespace PlzOpenMe.Models
                 entity.ToTable("POM_Users");
 
                 entity.Property(e => e.Id)
-                    .HasColumnType("bigint(20)")
-                    .HasComment("UUID for all users in PlzOpenMe");
+                    .HasColumnType("int(11)")
+                    .HasComment("POM user primary key");
+
+                entity.Property(e => e.Agreed).HasComment("POM user TOS agreement status");
 
                 entity.Property(e => e.AgreedOn)
                     .HasColumnType("datetime")
-                    .HasComment("Date Time when the user agreed");
+                    .HasComment("POM date of agreed to TOS");
 
-                entity.Property(e => e.Created)
+                entity.Property(e => e.CreatedOn)
                     .HasColumnType("datetime")
-                    .HasComment("Date and time of users first contact with the bot");
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasColumnType("varchar(128)")
-                    .HasComment("Telegram user first name")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.HasAgreed).HasComment("Stores if the user has agreed with the TOS and Privacy Policy");
-
-                entity.Property(e => e.IsBot).HasComment("Sets the bot status for a telegram user");
-
-                entity.Property(e => e.LanguageCode)
-                    .IsRequired()
-                    .HasColumnType("varchar(70)")
-                    .HasComment("User's language in Telegram")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.LastName)
-                    .IsRequired()
-                    .HasColumnType("varchar(128)")
-                    .HasComment("Telegram user last name")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasDefaultValueSql("current_timestamp()")
+                    .HasComment("POM date of first contact");
 
                 entity.Property(e => e.UserId)
                     .HasColumnType("bigint(20)")
-                    .HasComment("Telegram ID for the user");
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasColumnType("varchar(64)")
-                    .HasComment("Username in Telegram")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasComment("Telegram user ID");
             });
 
             OnModelCreatingPartial(modelBuilder);

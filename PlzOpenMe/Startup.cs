@@ -34,7 +34,7 @@ namespace PlzOpenMe
             // create the database service
             services.AddDbContext<PlzOpenMeContext>(builder => builder
                 .UseMySql(Configuration.GetConnectionString("MainDatabase"),
-                    new MySqlServerVersion(new Version(10, 3, 27)),
+                    new MySqlServerVersion(new Version(Configuration.GetValue<string>("MariaDbVersion"))),
                     mySqlOptions => mySqlOptions
                         .CharSetBehavior(CharSetBehavior.NeverAppend))
                 .EnableDetailedErrors()

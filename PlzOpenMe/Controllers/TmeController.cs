@@ -86,7 +86,8 @@ namespace PlzOpenMe.Controllers
                 // if they want info, lets tell them about us
                 if (updateMessage.Text.StartsWith("/info"))
                 {
-                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, "Let me introduce myself, I am PlzOpenMe, a file and media sharing platform integrated with Telegram. I will take any files you send me, repack them for anyone to see, and give you a link that you can use to share with your friends outside of Telegram. For more information please go to PlzOpen.Me.");
+                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, "Let me introduce myself, I am PlzOpenMe, a file and media sharing platform integrated with Telegram. I will take any files you send me, repack them for anyone to see, " +
+                                                                     "and give you a link that you can use to share with your friends outside of Telegram. For more information please go to https://plzopen.me.");
                     return Json(true);
                 }
                 

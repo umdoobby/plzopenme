@@ -12,5 +12,7 @@ namespace PlzOpenMe.Models
         public DateTime CreatedOn { get; set; }
         public DateTime? AgreedOn { get; set; }
         public bool? Agreed { get; set; }
+        public bool Banned { get; set; }
+        public DateTime? BannedOn { get; set; }
     }
 }

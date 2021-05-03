@@ -43,6 +43,12 @@ namespace PlzOpenMe.Models
                     .HasColumnType("datetime")
                     .HasComment("POM date of agreed to TOS");
 
+                entity.Property(e => e.Banned).HasComment("POM user ban status");
+
+                entity.Property(e => e.BannedOn)
+                    .HasColumnType("datetime")
+                    .HasComment("POM date of ban");
+
                 entity.Property(e => e.CreatedOn)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("current_timestamp()")

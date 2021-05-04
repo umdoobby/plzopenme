@@ -261,12 +261,35 @@ namespace PlzOpenMe.Controllers
             // check and see if they did not agree and their account wasn't deleted for some reason
             if (!fromUser.Agreed.Value)
             {
-                // this realistically should never happen but I dont want to chance it
+                // this realistically should never happen but I don't want to chance it
+                // fallback response
+                Log.Information($"The user {updateFrom.Id}/{updateFrom.Username} was blocked with agreement status {fromUser.Agreed.Value}");
                 _bot.SendTextMessageAsync(updateMessage.Chat.Id, "I'm sorry but you did not agree to my Terms of Service and my Privacy Policy. " +
                                                                  "There is nothing more that I can do for you. If you believe you are getting this message in error, please report it " +
                                                                  "in my GitHub at https://github.com/umdoobby/plzopenme. Sorry I can't be more help.");
                 return Json(true);
             }
+            
+            // check and see if this user is banned
+            if (fromUser.Banned)
+            {
+                // log the unwelcome communication
+                Log.Information($"The user {updateFrom.Id}/{updateFrom.Username} was blocked due to being banned");
+                
+                // just to make sure there is never a null date
+                if (fromUser.BannedOn.HasValue)
+                {
+                    // respond with banned message
+                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but your account was banned from PlzOpen.Me on {fromUser.BannedOn.Value.ToString("F")}.");
+                    return Json(true);
+                }
+                
+                // respond with banned message
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but your account was banned from PlzOpen.Me.");
+                return Json(true);
+            }
+            
+            _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but thats all i know to say right now");
 
             return Json(true);
         }

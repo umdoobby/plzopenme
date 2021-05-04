@@ -3,12 +3,43 @@
     ViewData["Title"] = "Privacy Policy";
 }
 
-<div class="container mt-2">
-    <h2>@ViewData["Title"]</h2>
-    <p class="text-muted">See what data we collect and how we use it.</p>
-    <hr />
+<section class="jumbotron text-center rounded-0">
+    <div class="container">
+        <h2>@ViewData["Title"]</h2>
+        <p class="lead">
+            See what data we collect and how we use it.
+        </p>
+    </div>
+</section>
 
-    <h4>Important note</h4>
+<div class="container mt-4">
+    <div class="card border-primary mb-3">
+        <div class="card-header">A message from the developer</div>
+        <div class="card-body">
+            <p class="card-text">
+                PlzOpen.Me is a side project of mine. I'm a single dude with no money or resources really, I'm just having a bit 
+                of fun. I'm not trying to make money off this. I just wanted to work with Telegram's bot API.
+                <br><br>
+                I don't have the money to hire a lawyer to write this document, I'm writing this by hand using my common sense. 
+                This is an open source project and if you are truely worried about what information I'm collecting and sharing 
+                I encourage you to go to my repository and look through my code! I'm not going to say that it's the best, most 
+                efficient code ever but I'm rather proud of what I have accomplished.
+                <br><br>
+                I also am not located in the European Union and I can't say that I fully understand all of the in's and out's of 
+                the General Data Protection Regulation (GDPR). However, I'm trying my best to be complient, honest, and transperent 
+                about what information is gathered and how that information is used.
+                <br><br>
+                So, as you read this, keep in mind that this is just a side project form someone just trying to have a bit of 
+                honest fun. Please don't try to sue me, I'm flat broke! Thanks!
+            </p>
+        </div>
+        <div class="card-footer text-muted">
+            Umdoobby
+        </div>
+    </div>
+
+    <h3 class="text-primary">Important note</h3>
+    <hr  class="border-secondary"/>
     <p>
         PlzOpen.Me is a side project of mine. I'm a single dude with no money or resources really, I'm just having a bit 
         of fun. I'm not trying to make money off this. I just wanted to work with Telegram's bot API.
@@ -28,7 +59,8 @@
         - Umdoobby
     </p>
     
-    <h4>Overview</h4>
+    <h3 class="text-primary">Overview</h3>
+    <hr  class="border-secondary"/>
     <p>
         PlzOpen.Me is a file sharing platform integrated into Telegram. The idea was to enable users to forward the bot 
         any piece of media and get a URL that can be used to share that media anywhere. That said, all of the information 
@@ -40,15 +72,9 @@
         I have endevored to collect as little information as needed and to collect absolutely no personally identifiable 
         information.
     </p>
-    
-    <h4>Terms of Service</h4>
-    <p>
-        To make the two documents easier to read the terms of service have been moved to a seperate Terms of Service page. 
-        To use the PlzOpenMeBot, you must have agreed to this privacy policy and the terms of service located here: <a asp-area="" asp-controller="Home" asp-action="Terms">Terms of Service</a>
-    </p>
-    
-    <h4>User data</h4>
-    <h6>What do we collect?</h6>
+
+    <h3 class="text-primary">User data</h3>
+    <h5 class="text-info">What do we collect?</h5>
     <p>
         A "User" in this context represents a Telegram account identified by it's unique user ID. This is a static ID that 
         exists for all Telegram accounts and is publically exposed as part of every Telegram message. This is the main piece 
@@ -71,13 +97,13 @@
         <li>Track and see if your Telegram account is ever deleted.</li>
         <li>Finally, it will be used to build a report of all information we have collected on you if/when you request that log.</li>
     </ul>
-    <h6>How can I see what you have collected?</h6>
+    <h5 class="text-info">How can I see what you have collected?</h5>
     <p>
         Well, as I previously said, this is an open source project so you can go to the repository and read through 
         every line of code to see how your data is used. You can also request a complete report of all information we 
         have saved on your account, including the URLs for all of the files you have uploaded.
     </p>
-    <h5>Can I delete my information?</h5>
+    <h5 class="text-info">Can I delete my information?</h5>
     <p>
         In short, you can! The PlzOpenMeBot on Telegram will allow you to request the deletion of all information we have 
         saved on you. We will not share any information that could pose a security risk to PlzOpen.Me or to any of the 
@@ -87,7 +113,7 @@
         but also all uploaded files. The system will delete all files you have uploaded and will mark all of your URLs as 
         invalid.
     </p>
-    <h6>Can I use the system anyonamously?</h6>
+    <h5 class="text-info">Can I use the system anyonamously?</h5>
     <p>
         If you are on the uploading side of PlzOpen.Me, the short answer is no. In order to upload information to PlzOpen.Me 
         you must have a Telegram account, and you must be willing to share some of the already public information about that account.
@@ -96,8 +122,8 @@
         here to consume a shared piece of media.
     </p>
     
-    <h4>Account standing</h4>
-    <h6>Getting banned</h6>
+    <h3 class="text-primary">Account standing</h3>
+    <h5 class="text-info">Getting banned</h5>
     <p>
         A ban will be issued if your account is found to violate our Terms of Service and/or our Privacy Policy. A ban is 
         permanent, it will be permanently assiciated with your Telegram user ID. If you are banned, you may still request 
@@ -110,7 +136,7 @@
         <br>
         Sorry, but if your account has been banned, there is nothing more you can do.
     </p>
-    <h6>Agreement status</h6>
+    <h5 class="text-info">Agreement status</h5>
     <p>
         If your account isn't banned, the primary factor that determins your ability to use PlzOpen.Me is your agreement 
         status. In order to share files through PlzOpen.Me you absolutely must agree to the terms of service and Privacy 
@@ -120,4 +146,9 @@
         rules. This is the primary way I know you have read over everything and know what you are doing with your information.
     </p>
     
+    <h3 class="text-primary">Terms of Service</h3>
+    <p>
+        To make the two documents easier to read the terms of service have been moved to a seperate Terms of Service page. 
+        To use the PlzOpenMeBot, you must have agreed to this privacy policy and the terms of service located here: <a asp-area="" asp-controller="Home" asp-action="Terms">Terms of Service</a>
+    </p>
 </div>

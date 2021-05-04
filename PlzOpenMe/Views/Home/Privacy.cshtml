@@ -4,12 +4,11 @@
 }
 
 <div class="container">
-    <h1>
-        @ViewData["Title"]
-        <small class="text-muted">See what data we collect and how we use it.</small>
-    </h1>
+    <h2>@ViewData["Title"]</h2>
+    <small class="text-muted">See what data we collect and how we use it.</small>
+    <hr />
 
-    <h2>Important note</h2>
+    <h4>Important note</h4>
     <p>
         PlzOpen.Me is a side project of mine. I'm a single dude with no money or resources really, I'm just having a bit 
         of fun. I'm not trying to make money off this. I just wanted to work with Telegram's bot API.
@@ -29,7 +28,7 @@
         - Umdoobby
     </p>
     
-    <h2>Overview</h2>
+    <h4>Overview</h4>
     <p>
         PlzOpen.Me is a file sharing platform integrated into Telegram. The idea was to enable users to forward the bot 
         any piece of media and get a URL that can be used to share that media anywhere. That said, all of the information 
@@ -42,14 +41,14 @@
         information.
     </p>
     
-    <h3>Terms of Service</h3>
+    <h4>Terms of Service</h4>
     <p>
         To make the two documents easier to read the terms of service have been moved to a seperate Terms of Service page. 
         To use the PlzOpenMeBot, you must have agreed to this privacy policy and the terms of service located here: <a asp-area="" asp-controller="Home" asp-action="Terms">Terms of Service</a>
     </p>
     
-    <h2>User data</h2>
-    <h3>What do we collect?</h3>
+    <h4>User data</h4>
+    <h5>What do we collect?</h5>
     <p>
         A "User" in this context represents a Telegram account identified by it's unique user ID. This is a static ID that 
         exists for all Telegram accounts and is publically exposed as part of every Telegram message. This is the main piece 
@@ -72,13 +71,13 @@
         <li>Track and see if your Telegram account is ever deleted.</li>
         <li>Finally, it will be used to build a report of all information we have collected on you if/when you request that log.</li>
     </ul>
-    <h3>How can I see what you have collected?</h3>
+    <h5>How can I see what you have collected?</h5>
     <p>
         Well, as I previously said, this is an open source project so you can go to the repository and read through 
         every line of code to see how your data is used. You can also request a complete report of all information we 
         have saved on your account, including the URLs for all of the files you have uploaded.
     </p>
-    <h3>Can I delete my information?</h3>
+    <h5>Can I delete my information?</h5>
     <p>
         In short, you can! The PlzOpenMeBot on Telegram will allow you to request the deletion of all information we have 
         saved on you. We will not share any information that could pose a security risk to PlzOpen.Me or to any of the 
@@ -88,7 +87,7 @@
         but also all uploaded files. The system will delete all files you have uploaded and will mark all of your URLs as 
         invalid.
     </p>
-    <h3>Can I use the system anyonamously?</h3>
+    <h5>Can I use the system anyonamously?</h5>
     <p>
         If you are on the uploading side of PlzOpen.Me, the short answer is no. In order to upload information to PlzOpen.Me 
         you must have a Telegram account, and you must be willing to share some of the already public information about that account.
@@ -97,8 +96,8 @@
         here to consume a shared piece of media.
     </p>
     
-    <h2>Account standing</h2>
-    <h3>Getting banned</h3>
+    <h4>Account standing</h4>
+    <h5>Getting banned</h5>
     <p>
         A ban will be issued if your account is found to violate our Terms of Service and/or our Privacy Policy. A ban is 
         permanent, it will be permanently assiciated with your Telegram user ID. If you are banned, you may still request 
@@ -111,7 +110,7 @@
         <br>
         Sorry, but if your account has been banned, there is nothing more you can do.
     </p>
-    <h3>Agreement status</h3>
+    <h5>Agreement status</h5>
     <p>
         If your account isn't banned, the primary factor that determins your ability to use PlzOpen.Me is your agreement 
         status. In order to share files through PlzOpen.Me you absolutely must agree to the terms of service and Privacy 

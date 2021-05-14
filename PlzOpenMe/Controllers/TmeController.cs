@@ -289,8 +289,94 @@ namespace PlzOpenMe.Controllers
                 return Json(true);
             }
             
-            _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but thats all i know to say right now");
+            // at this point we know that we have a valid, not banned user lets get into the commands that they can run
 
+            // if there are no entities then there better be a file attached or i won't know what to do
+            if (updateMessage.Entities == null)
+            {
+                // placeholder response
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but i'm not actually useful yet");
+                return Json(true);
+            }
+            
+            // so there is a command lets see what they want to do and do it
+            // start with the help command
+            if (updateMessage.Text.StartsWith("/help"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"You account is fully set up and active! To upload a file you simply " +
+                                                                 $"need to forward me the message containing the file. However, I can help with a few other things. " +
+                                                                 $"Here's a list of all valid commands:\n" +
+                                                                 $"/help to repeat this info\n" +
+                                                                 $"/info to learn about PlzOpen.Me\n" +
+                                                                 $"/getLinks to return a list of all valid links tied to your account\n" +
+                                                                 $"/deleteLink <PlzOpen.Me link> to delete the specified file and link\n" +
+                                                                 $"/getMyInfo to return a text report of all information we have on your account\n" +
+                                                                 $"/stop to delete your account and all files associated to it");
+                return Json(true);
+            }
+            
+            // info command
+            if (updateMessage.Text.StartsWith("/info"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"PlzOpen.Me is an open source file sharing platform allowing you to easily " +
+                                                                 $"send files from Telegram to anyone on any messaging platform. All you have to do is " +
+                                                                 $"forward any message containing a file, image, video, etc. and I will respond with a sharable link " +
+                                                                 $"to the file on the PlzOpen.Me website.\n\n" +
+                                                                 $"Please report any issues, bugs, or whatever else on the PlzOpen.Me GitHub page.\n" +
+                                                                 $"https://github.com/umdoobby/plzopenme\n" +
+                                                                 $"please consider giving the project a star and maybe a watch if you have found it useful!\n\n" +
+                                                                 $"If you are interested in keeping up with the latest news, upcoming features, " +
+                                                                 $"or any announcements please consider joining the PlzOpen.Me announcements channel here on Telegram.\n" +
+                                                                 $"https://t.me/pomUpdates\n\n" +
+                                                                 $"More information about this service can be found on https://plzopen.me\n" +
+                                                                 $"I hope you found this helpful!");
+                return Json(true);
+            }
+            
+            // start command
+            if (updateMessage.Text.StartsWith("/start"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Your account is already set up! You don't have to start again.");
+                return Json(true);
+            }
+            
+            // stop and delete
+            if (updateMessage.Text.StartsWith("/stop"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"placeholder for deleting the account");
+                return Json(true);
+            }
+            
+            // credits
+            if (updateMessage.Text.StartsWith("/credits"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"this is the credits");
+                return Json(true);
+            }
+            
+            // list my links
+            if (updateMessage.Text.StartsWith("/getLinks"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"This is a list of your links");
+                return Json(true);
+            }
+            
+            // get account report
+            if (updateMessage.Text.StartsWith("/getMyInfo"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"This is all of the info we have on you");
+                return Json(true);
+            }
+            
+            // delete a file
+            if (updateMessage.Text.StartsWith("/deleteLink"))
+            {
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"This is all of the info we have on you");
+                return Json(true);
+            }
+            
+            // finally you must have sent a command that i don't know
+            _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but I don't know that command. Use the /help command for a list of all valid commands.");
             return Json(true);
         }
     }

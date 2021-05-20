@@ -294,8 +294,119 @@ namespace PlzOpenMe.Controllers
             // if there are no entities then there better be a file attached or i won't know what to do
             if (updateMessage.Entities == null)
             {
+                // set up a few variables for grabbing a file if we find it
+                bool foundFile = false;
+                string fileId = "";
+                string fuid = "";
+                string fileName = "";
+                string fileMimeType = "";
+                int fileSize = 0;
+                string filetype = "";
+                
+                // see if there is an animation in this message
+                if (updateMessage.Animation != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Animation.FileId;
+                    fuid = updateMessage.Animation.FileUniqueId;
+                    fileName = updateMessage.Animation.FileName;
+                    fileMimeType = updateMessage.Animation.MimeType;
+                    fileSize = updateMessage.Animation.FileSize;
+                    filetype = "Animation";
+                }
+                
+                // see if there is an audio file in this message
+                if (!foundFile && updateMessage.Audio != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Audio.FileId;
+                    fuid = updateMessage.Audio.FileUniqueId;
+                    fileName = updateMessage.Audio.Title;
+                    fileMimeType = updateMessage.Audio.MimeType;
+                    fileSize = updateMessage.Audio.FileSize;
+                    filetype = "Audio";
+                }
+                
+                // see if there is a generic file in this message
+                if (!foundFile && updateMessage.Document != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Document.FileId;
+                    fuid = updateMessage.Document.FileUniqueId;
+                    fileName = updateMessage.Document.FileName;
+                    fileMimeType = updateMessage.Document.MimeType;
+                    fileSize = updateMessage.Document.FileSize;
+                    filetype = "Document";
+                }
+                
+                // see if there is a photo in this message
+                if (!foundFile && updateMessage.Photo != null)
+                {
+                    Log.Information("Sent a file but it had photos in it.");
+                }
+                
+                // see if there is a sticker in this message
+                if (!foundFile && updateMessage.Sticker != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Sticker.FileId;
+                    fuid = updateMessage.Sticker.FileUniqueId;
+                    fileName = updateMessage.Sticker.SetName + " | " + updateMessage.Sticker.Emoji;
+                    fileMimeType = "sticker";
+                    fileSize = updateMessage.Sticker.FileSize;
+                    filetype = "Sticker";
+                }
+                
+                // see if there is a video in this message
+                if (!foundFile && updateMessage.Video != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Video.FileId;
+                    fuid = updateMessage.Video.FileUniqueId;
+                    fileName = "video";
+                    fileMimeType = updateMessage.Video.MimeType;
+                    fileSize = updateMessage.Video.FileSize;
+                    filetype = "Video";
+                }
+                
+                // see if there is a video note in this message
+                if (!foundFile && updateMessage.VideoNote != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.VideoNote.FileId;
+                    fuid = updateMessage.VideoNote.FileUniqueId;
+                    fileName = "videoNote";
+                    fileMimeType = "videoNote";
+                    fileSize = updateMessage.VideoNote.FileSize;
+                    filetype = "VideoNote";
+                }
+                
+                // see if there is a voice message in the message
+                if (!foundFile && updateMessage.Voice != null)
+                {
+                    foundFile = true;
+                    fileId = updateMessage.Voice.FileId;
+                    fuid = updateMessage.Voice.FileUniqueId;
+                    fileName = "voice";
+                    fileMimeType = updateMessage.Voice.MimeType;
+                    fileSize = updateMessage.Voice.FileSize;
+                    filetype = "Voice";
+                }
+
+                // if we have a file we can work with, here is where we do it
+                if (foundFile)
+                {
+                    // see if the file is too big
+
+                    string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
+                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Filepath = {filePath}", 
+                        ParseMode.Default, false, false, updateMessage.MessageId);
+                    return Json(true);
+                }
+                
                 // placeholder response
-                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but i'm not actually useful yet");
+                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but there doesn't seem to be any files attached to that message.", 
+                    ParseMode.Default, false, false, updateMessage.MessageId);
                 return Json(true);
             }
             

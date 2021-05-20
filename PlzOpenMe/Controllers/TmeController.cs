@@ -399,7 +399,7 @@ namespace PlzOpenMe.Controllers
                     // see if the file is too big
 
                     string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
-                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Filepath = {filePath}", 
+                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Filepath = {filePath} | size = {fileSize}", 
                         ParseMode.Default, false, false, updateMessage.MessageId);
                     return Json(true);
                 }

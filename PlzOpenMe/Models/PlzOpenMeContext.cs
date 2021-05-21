@@ -18,13 +18,14 @@ namespace PlzOpenMe.Models
         }
 
         public virtual DbSet<PomFile> PomFiles { get; set; }
+        public virtual DbSet<PomLink> PomLinks { get; set; }
         public virtual DbSet<PomUser> PomUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                throw new NotImplementedException("SQL not configured");
+                throw new NotImplementedException("Database context not set");
             }
         }
 
@@ -35,80 +36,103 @@ namespace PlzOpenMe.Models
                 entity.ToTable("POM_Files");
 
                 entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasComment("ID for every file");
+                    .HasColumnType("bigint(20)")
+                    .HasComment("POM unique ID");
 
-                entity.Property(e => e.CheckSum)
+                entity.Property(e => e.DeletedOn)
+                    .HasColumnType("datetime")
+                    .HasComment("When the file was deleted");
+
+                entity.Property(e => e.FileId)
                     .IsRequired()
-                    .HasColumnType("longtext")
-                    .HasComment("File hash")
+                    .HasColumnType("text")
+                    .HasComment("Telegram file ID")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.FileUniqueId)
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasComment("Telegram unique file ID")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Location)
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasComment("Name on disk")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Mime)
+                    .HasColumnType("text")
+                    .HasComment("Telegram MIME type")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.Size)
+                    .HasColumnType("int(11)")
+                    .HasComment("Telegram file size");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasColumnType("tinytext")
+                    .HasComment("POM file type")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.UploadedOn)
+                    .HasColumnType("datetime")
+                    .HasComment("When file was received");
+            });
+
+            modelBuilder.Entity<PomLink>(entity =>
+            {
+                entity.ToTable("POM_Links");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20)")
+                    .HasComment("POM unique ID");
+
+                entity.Property(e => e.AddedOn)
+                    .HasColumnType("datetime")
+                    .HasComment("When the link was created");
+
+                entity.Property(e => e.Collection)
+                    .HasColumnType("varchar(15)")
+                    .HasComment("POM link to group of files")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.File)
+                    .HasColumnType("bigint(20)")
+                    .HasComment("POM file ID");
 
                 entity.Property(e => e.Link)
                     .IsRequired()
-                    .HasColumnType("varchar(10)")
-                    .HasComment("Unique URL id")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.Message)
-                    .HasColumnType("mediumtext")
-                    .HasComment("Message attached to the file")
+                    .HasColumnType("varchar(15)")
+                    .HasComment("POM link to file")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnType("mediumtext")
-                    .HasComment("File name as report by Telegram")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.OnDisk)
-                    .IsRequired()
-                    .HasColumnType("varchar(25)")
-                    .HasComment("Name of the file on the server")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.PostedBy)
-                    .HasColumnType("bigint(20)")
-                    .HasComment("Telegram ID of who uploaded the file to Telegram");
-
-                entity.Property(e => e.RemovalReason)
-                    .HasColumnType("mediumtext")
-                    .HasComment("comment on why file was removed")
+                    .HasColumnType("text")
+                    .HasComment("Telegram name of file")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.RemovedOn)
                     .HasColumnType("datetime")
-                    .HasComment("Date time of file removal");
+                    .HasComment("When the link was removed");
 
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasColumnType("enum('Animation','Audio','Document','Video','VideoNote','Voice','File','Sticker')")
-                    .HasComment("File type as reported from Telegram")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
-
-                entity.Property(e => e.UploadedBy)
+                entity.Property(e => e.UserId)
                     .HasColumnType("bigint(20)")
-                    .HasComment("Telegram user ID of who sent the file to the bot");
-
-                entity.Property(e => e.UploadedOn)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("current_timestamp()")
-                    .HasComment("Datetime when the file was uploaded");
+                    .HasComment("Telegram user ID");
 
                 entity.Property(e => e.Views)
-                    .HasColumnType("int(11)")
-                    .HasComment("Number of times this file has been requested");
-
-                entity.Property(e => e.VirusScannedOn)
-                    .HasColumnType("datetime")
-                    .HasComment("Date time when virus scan was finished");
+                    .HasColumnType("bigint(20)")
+                    .HasComment("Number of times the file has been requested");
             });
 
             modelBuilder.Entity<PomUser>(entity =>
@@ -116,7 +140,7 @@ namespace PlzOpenMe.Models
                 entity.ToTable("POM_Users");
 
                 entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
+                    .HasColumnType("bigint(20)")
                     .HasComment("POM user primary key");
 
                 entity.Property(e => e.Agreed).HasComment("POM user TOS agreement status");

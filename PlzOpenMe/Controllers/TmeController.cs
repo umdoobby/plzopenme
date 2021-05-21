@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
+using nClam;
 using PlzOpenMe.Models;
 using Serilog;
 using Telegram.Bot;
@@ -296,102 +301,84 @@ namespace PlzOpenMe.Controllers
             {
                 // set up a few variables for grabbing a file if we find it
                 bool foundFile = false;
-                string fileId = "";
-                string fuid = "";
-                string fileName = "";
-                string fileMimeType = "";
-                int fileSize = 0;
-                string filetype = "";
-                
+                List<long> fileIds = new List<long>();
+                List<string> fileNames = new List<string>();
+
                 // see if there is an animation in this message
-                if (updateMessage.Animation != null)
+                try
                 {
-                    foundFile = true;
-                    fileId = updateMessage.Animation.FileId;
-                    fuid = updateMessage.Animation.FileUniqueId;
-                    fileName = updateMessage.Animation.FileName;
-                    fileMimeType = updateMessage.Animation.MimeType;
-                    fileSize = updateMessage.Animation.FileSize;
-                    filetype = "Animation";
+                    if (updateMessage.Animation != null)
+                    {
+                        foundFile = false;
+                        while (!foundFile)
+                        {
+                            // try to find the animation
+                            var animationQuery = from an in _dbContext.PomFiles
+                                where an.FileUniqueId == updateMessage.Animation.FileUniqueId
+                                select an;
+
+                            if (animationQuery.Any())
+                            {
+                                // we found the file so we need to grab the id
+                                fileIds.Add(animationQuery.First().Id);
+                                foundFile = true;
+                                
+                                // save the name if there is one
+                                if (String.IsNullOrWhiteSpace(updateMessage.Animation.FileName))
+                                {
+                                    fileNames.Add("Untitled Animation");
+                                }
+                                else
+                                {
+                                    fileNames.Add(updateMessage.Animation.FileName);
+                                }
+                            }
+                            else
+                            {
+                                // we need to add the file
+                                PomFile newFile = new PomFile()
+                                {
+                                    FileId = updateMessage.Animation.FileId,
+                                    FileUniqueId = updateMessage.Animation.FileUniqueId,
+                                    Location = FindUniqueFilePath(),
+                                    Mime = updateMessage.Animation.MimeType,
+                                    Size = updateMessage.Animation.FileSize,
+                                    Type = "Animation",
+                                    UploadedOn = DateTime.Now
+                                };
+                                
+                                // save the file
+                                if (Downloadfile(newFile.Location, newFile.FileId))
+                                {
+                                    // we saved the file
+                                    _dbContext.Add(newFile);
+                                    int dbSave = _dbContext.SaveChanges();
+                                    Log.Information($"User {updateFrom.Id} uploaded animation {updateMessage.Animation.FileUniqueId} as {newFile.Location}");
+                                }
+                                else
+                                {
+                                    // we failed to save the file
+                                    Log.Information($"User {updateFrom.Id} failed to upload animation {updateMessage.Animation.FileUniqueId} as {newFile.Location}");
+                                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but there was an error while attempting to save this file. " +
+                                        $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.", 
+                                        ParseMode.Default, false, false, updateMessage.MessageId);
+                                    return Json(false);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // there was an error while trying to save the file
+                    Log.Error(ex, $"Fatal error occured while saving {updateMessage.Animation.FileId} for user {updateFrom.Id}");
+                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but there was a fatal error while trying to save that file. " +
+                                                                     $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!", 
+                        ParseMode.Default, false, false, updateMessage.MessageId);
+                    return Json(false);
                 }
                 
-                // see if there is an audio file in this message
-                if (!foundFile && updateMessage.Audio != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.Audio.FileId;
-                    fuid = updateMessage.Audio.FileUniqueId;
-                    fileName = updateMessage.Audio.Title;
-                    fileMimeType = updateMessage.Audio.MimeType;
-                    fileSize = updateMessage.Audio.FileSize;
-                    filetype = "Audio";
-                }
                 
-                // see if there is a generic file in this message
-                if (!foundFile && updateMessage.Document != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.Document.FileId;
-                    fuid = updateMessage.Document.FileUniqueId;
-                    fileName = updateMessage.Document.FileName;
-                    fileMimeType = updateMessage.Document.MimeType;
-                    fileSize = updateMessage.Document.FileSize;
-                    filetype = "Document";
-                }
-                
-                // see if there is a photo in this message
-                if (!foundFile && updateMessage.Photo != null)
-                {
-                    Log.Information("Sent a file but it had photos in it.");
-                }
-                
-                // see if there is a sticker in this message
-                if (!foundFile && updateMessage.Sticker != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.Sticker.FileId;
-                    fuid = updateMessage.Sticker.FileUniqueId;
-                    fileName = updateMessage.Sticker.SetName + " | " + updateMessage.Sticker.Emoji;
-                    fileMimeType = "sticker";
-                    fileSize = updateMessage.Sticker.FileSize;
-                    filetype = "Sticker";
-                }
-                
-                // see if there is a video in this message
-                if (!foundFile && updateMessage.Video != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.Video.FileId;
-                    fuid = updateMessage.Video.FileUniqueId;
-                    fileName = "video";
-                    fileMimeType = updateMessage.Video.MimeType;
-                    fileSize = updateMessage.Video.FileSize;
-                    filetype = "Video";
-                }
-                
-                // see if there is a video note in this message
-                if (!foundFile && updateMessage.VideoNote != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.VideoNote.FileId;
-                    fuid = updateMessage.VideoNote.FileUniqueId;
-                    fileName = "videoNote";
-                    fileMimeType = "videoNote";
-                    fileSize = updateMessage.VideoNote.FileSize;
-                    filetype = "VideoNote";
-                }
-                
-                // see if there is a voice message in the message
-                if (!foundFile && updateMessage.Voice != null)
-                {
-                    foundFile = true;
-                    fileId = updateMessage.Voice.FileId;
-                    fuid = updateMessage.Voice.FileUniqueId;
-                    fileName = "voice";
-                    fileMimeType = updateMessage.Voice.MimeType;
-                    fileSize = updateMessage.Voice.FileSize;
-                    filetype = "Voice";
-                }
 
                 // if we have a file we can work with, here is where we do it
                 if (foundFile)
@@ -489,6 +476,109 @@ namespace PlzOpenMe.Controllers
             // finally you must have sent a command that i don't know
             _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"I'm sorry but I don't know that command. Use the /help command for a list of all valid commands.");
             return Json(true);
+        }
+
+        /// <summary>
+        /// Get a filename that is unique to this file
+        /// </summary>
+        /// <returns>Unique string</returns>
+        private string FindUniqueFilePath()
+        {
+            bool isUnique = false;
+            string newFile = "";
+            int maxAttempts = 999;
+            int attempt = 0;
+
+            while (!isUnique && attempt <= maxAttempts)
+            {
+                // get a new file name
+                newFile = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("FileNameLength"));
+
+                // try to find it
+                var nameQuery = from fn in _dbContext.PomFiles
+                    where fn.Location == newFile
+                    select fn;
+                
+                // if we found one we need to try again else continue
+                if (nameQuery.Any())
+                {
+                    attempt++;
+                }
+                else
+                {
+                    isUnique = true;
+                }
+            }
+
+            if (isUnique)
+            {
+                return newFile;
+            } 
+            
+            var ex = new DataException("Max number of attempts to generate a unique string reached");
+            Log.Error(ex, "Failed to generate a new filename failed to save the file");
+            throw ex;
+            return "";
+        }
+
+        /// <summary>
+        /// Download a file from telegram and scan it for viruses
+        /// </summary>
+        /// <param name="name">name for the new file</param>
+        /// <param name="fileId">file id of the file to download</param>
+        /// <returns>True for a successful download or false for a filed download</returns>
+        private bool Downloadfile(string name, string fileId)
+        {
+            bool rtn = false;
+            string[] clamAvConnection = _configuration.GetConnectionString("ClamAvServer").Split(':');
+            
+            // first get the path from telegram
+            string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
+            
+            // build the download link
+            string download =
+                $"https://api.telegram.org/file/{_configuration.GetValue<string>("TelegramApiKey")}/{filePath}";
+
+            // open a web client and download the file
+            using (WebClient webClient = new WebClient())
+            {
+                Log.Information($"Attempting to fetch {download} to {name}");
+                webClient.DownloadFile(download, _configuration.GetValue<string>("FileStore") + name);
+            }
+            
+            // now that we have the file lets scan it
+            Log.Information($"Scanning {name} for viruses");
+            var clam = new ClamClient(clamAvConnection[0], int.Parse(clamAvConnection[1]));
+            var scanResult = clam.ScanFileOnServerAsync(_configuration.GetValue<string>("FileStore") + name).Result;
+ 
+            // what was the result
+            switch (scanResult.Result)
+            {
+                case ClamScanResults.Clean:
+                    // clean is an ok by me
+                    Log.Information($"File {name} is clean");
+                    rtn = true;
+                    break;
+                case ClamScanResults.VirusDetected:
+                    // there is a threat in the file, just dispose of it
+                    Log.Error($"File {name} contains a threat: {scanResult.InfectedFiles.First().VirusName}");
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    System.IO.File.Delete(_configuration.GetValue<string>("FileStore") + name);
+                    rtn = false;
+                    break;
+                case ClamScanResults.Error:
+                    // we failed to scan it for some reason, too risky just delete the file
+                    Log.Warning($"Failed to scan file {name}\n{scanResult.RawResult}");
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    System.IO.File.Delete(_configuration.GetValue<string>("FileStore") + name);
+                    rtn = false;
+                    break;
+            }
+            
+            // return the result
+            return rtn;
         }
     }
 }

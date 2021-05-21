@@ -7,7 +7,7 @@ namespace PlzOpenMe.Models
 {
     public partial class PomUser
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public long UserId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? AgreedOn { get; set; }

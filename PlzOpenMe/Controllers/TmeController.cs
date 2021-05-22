@@ -305,9 +305,9 @@ namespace PlzOpenMe.Controllers
                 List<string> fileNames = new List<string>();
 
                 // see if there is an animation in this message
-                try
+                if (updateMessage.Animation != null)
                 {
-                    if (updateMessage.Animation != null)
+                    try
                     {
                         foundFile = false;
                         while (!foundFile)
@@ -353,7 +353,7 @@ namespace PlzOpenMe.Controllers
                                     // we saved the file
                                     _dbContext.Add(newFile);
                                     int dbSave = _dbContext.SaveChanges();
-                                    Log.Information($"User {updateFrom.Id} uploaded animation {updateMessage.Animation.FileUniqueId} as {newFile.Location}");
+                                    Log.Information($"User {updateFrom.Id} uploaded animation {updateMessage.Animation.FileUniqueId} as {newFile.Location} with result {dbSave}");
                                 }
                                 else
                                 {
@@ -367,28 +367,116 @@ namespace PlzOpenMe.Controllers
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex, $"Fatal error occured while saving {updateMessage.Animation.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but there was a fatal error while trying to save that file. " +
+                                                                         $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!", 
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    // there was an error while trying to save the file
-                    Log.Error(ex, $"Fatal error occured while saving {updateMessage.Animation.FileId} for user {updateFrom.Id}");
-                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry but there was a fatal error while trying to save that file. " +
-                                                                     $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!", 
-                        ParseMode.Default, false, false, updateMessage.MessageId);
-                    return Json(false);
-                }
+                
                 
                 
 
                 // if we have a file we can work with, here is where we do it
-                if (foundFile)
+                if (fileIds.Count > 0)
                 {
-                    // see if the file is too big
+                    // is there more than one file
+                    if (fileIds.Count > 1)
+                    {
+                        try
+                        {
+                            // there are multiple files
+                            // set up a couple variables
+                            string collection = MakeCollection();
+                            List<PomLink> links = new List<PomLink>();
 
-                    string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
-                    _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Filepath = {filePath} | size = {fileSize}", 
-                        ParseMode.Default, false, false, updateMessage.MessageId);
-                    return Json(true);
+                            for (int i = 0; i < fileIds.Count; i++)
+                            {
+                                // create the new link
+                                PomLink newLink = new PomLink()
+                                {
+                                    UserId = updateFrom.Id,
+                                    AddedOn = DateTime.Now,
+                                    File = fileIds[i],
+                                    Link = MakeLink(),
+                                    Views = 0,
+                                    Name = fileNames[i],
+                                    Collection = collection
+                                };
+                                links.Add(newLink);
+                                Log.Information($"Adding {newLink.Link} to {collection}");
+                            }
+                            
+                            // save the links to the db
+                            _dbContext.PomLinks.AddRange(links.ToArray());
+                            int linkResult = _dbContext.SaveChanges();
+                            Log.Information($"New collection \"{collection}\" created for {updateFrom.Id} with result {linkResult}");
+                            
+                            // send the success message
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"{_configuration.GetValue<string>("LiveUrl")}pallet/{collection}",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            {
+                                // log the error
+                                Log.Error(ex, $"There was an error while trying to create a new link for {updateFrom.Id} with " +
+                                              $"file {fileIds[0]}");
+                            
+                                // report the error to the user
+                                _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry, there was an unexpected error while trying to build the pallet. " +
+                                    $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.", 
+                                    ParseMode.Default, false, false, updateMessage.MessageId);
+                                return Json(true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // there was only one file
+                        try
+                        {
+                            // create the new link
+                            PomLink newLink = new PomLink()
+                            {
+                                UserId = updateFrom.Id,
+                                AddedOn = DateTime.Now,
+                                File = fileIds[0],
+                                Link = MakeLink(),
+                                Views = 0,
+                                Name = fileNames[0]
+                            };
+
+                            // save the link
+                            _dbContext.PomLinks.Add(newLink);
+                            int linkResult = _dbContext.SaveChanges();
+                            Log.Information($"New link \"{newLink.Link}\" created for {updateFrom.Id} with result {linkResult}");
+
+                            // send the success message
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"{_configuration.GetValue<string>("LiveUrl")}box/{newLink.Link}",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            // log the error
+                            Log.Error(ex, $"There was an error while trying to create a new link for {updateFrom.Id} with " +
+                                          $"file {fileIds[0]}");
+                            
+                            // report the error to the user
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id, $"Sorry, there was an unexpected error while trying to build the package. " +
+                                                                             $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.", 
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(true);
+                        }
+                    }
                 }
                 
                 // placeholder response
@@ -515,10 +603,100 @@ namespace PlzOpenMe.Controllers
                 return newFile;
             } 
             
-            var ex = new DataException("Max number of attempts to generate a unique string reached");
-            Log.Error(ex, "Failed to generate a new filename failed to save the file");
-            throw ex;
+            throw new DataException("Max number of attempts to generate a unique string reached");
             return "";
+        }
+
+        /// <summary>
+        /// build a unique link to a file
+        /// </summary>
+        /// <returns>unique string</returns>
+        /// <exception cref="DataException">failed to make a new link string</exception>
+        private string MakeLink()
+        {
+            // make a couple of variables
+            string rtn = "";
+            bool unique = false;
+            int maxAttempts = 999;
+            int attempt = 0;
+
+            // try to make a unique string
+            while (!unique && attempt <= maxAttempts)
+            {
+                // make the string
+                rtn = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("BoxLength"));
+
+                // built the query
+                var linkQuery = from fl in _dbContext.PomLinks
+                    where fl.Link == rtn
+                    select fl;
+                
+                // is it unique
+                if (linkQuery.Any())
+                {
+                    attempt++;
+                }
+                else
+                {
+                    unique = true;
+                }
+            }
+            
+            // did we make a new link
+            if (unique)
+            {
+                // yes so return it
+                return rtn;
+            }
+            
+            // failed to make a new link
+            throw new DataException("Max number of attempts to generate a unique links reached");
+        }
+        
+        /// <summary>
+        /// generate a unique link to a collection
+        /// </summary>
+        /// <returns>unique collection string</returns>
+        /// <exception cref="DataException">failed to generate new collection string</exception>
+        private string MakeCollection()
+        {
+            // make a couple of variables
+            string rtn = "";
+            bool unique = false;
+            int maxAttempts = 999;
+            int attempt = 0;
+
+            // try to make a unique string
+            while (!unique && attempt <= maxAttempts)
+            {
+                // make the string
+                rtn = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("PalletLength"));
+
+                // built the query
+                var collectionQuery = from cl in _dbContext.PomLinks
+                    where cl.Link == rtn
+                    select cl;
+                
+                // is it unique
+                if (collectionQuery.Any())
+                {
+                    attempt++;
+                }
+                else
+                {
+                    unique = true;
+                }
+            }
+            
+            // did we make a new collection
+            if (unique)
+            {
+                // yes so return it
+                return rtn;
+            }
+            
+            // failed to make a new collection
+            throw new DataException("Max number of attempts to generate a unique collection reached");
         }
 
         /// <summary>

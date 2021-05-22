@@ -715,7 +715,7 @@ namespace PlzOpenMe.Controllers
             
             // build the download link
             string download =
-                $"https://api.telegram.org/file/{_configuration.GetValue<string>("TelegramApiKey")}/{filePath}";
+                $"https://api.telegram.org/file/bot{_configuration.GetValue<string>("TelegramApiKey")}/{filePath}";
 
             // open a web client and download the file
             using (WebClient webClient = new WebClient())

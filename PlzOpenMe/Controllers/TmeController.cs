@@ -401,6 +401,43 @@ namespace PlzOpenMe.Controllers
                         return Json(false);
                     }
                 }
+                
+                // see if there is a document in this message
+                if (updateMessage.Document != null)
+                {
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(updateMessage.Document.FileId, updateMessage.Document.FileUniqueId,
+                            updateMessage.Document.FileSize, updateMessage.Document.MimeType, "Document",
+                            updateMessage.Document.FileName, updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so add the file to the array
+                        files.Add(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.Document.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save that file. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                }
 
 
 

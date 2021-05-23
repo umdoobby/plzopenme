@@ -502,25 +502,21 @@ namespace PlzOpenMe.Controllers
                 // see if there are any photos in this message
                 if (!foundFile && updateMessage.Photo != null)
                 {
-                    Log.Information($"Found photo array {updateMessage.Photo.Length}");
-                    
                     PhotoSize original = new PhotoSize();
                     PhotoSize thumb = new PhotoSize();
 
-                    // find the largest
+                    int maxSize = updateMessage.Photo.Max(size => size.FileSize);
+                    int minSize = updateMessage.Photo.Min(size => size.FileSize);
+                    
+                    // find values
                     foreach (PhotoSize size in updateMessage.Photo)
                     {
-                        if (original.FileSize > size.FileSize)
+                        if (size.FileSize == maxSize)
                         {
                             original = size;
-                            thumb = size;
                         }
-                    }
-                    
-                    // find the smallest
-                    foreach (PhotoSize size in updateMessage.Photo)
-                    {
-                        if (thumb.FileSize <= size.FileSize)
+
+                        if (size.FileSize == minSize)
                         {
                             thumb = size;
                         }

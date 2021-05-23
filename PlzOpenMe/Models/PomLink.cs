@@ -10,7 +10,7 @@ namespace PlzOpenMe.Models
         public long Id { get; set; }
         public long File { get; set; }
         public string Link { get; set; }
-        public string Collection { get; set; }
+        public long? Thumbnail { get; set; }
         public long Views { get; set; }
         public long UserId { get; set; }
         public string Name { get; set; }

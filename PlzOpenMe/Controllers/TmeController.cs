@@ -326,7 +326,10 @@ namespace PlzOpenMe.Controllers
             if (updateMessage.Entities == null)
             {
                 // set up a few variables for grabbing a file if we find it
-                List<UploadedFile> files = new List<UploadedFile>();
+                UploadedFile newFile = new UploadedFile();
+                UploadedFile newThumb = new UploadedFile();
+                bool foundFile = false;
+                bool foundThumb = false;
 
                 // see if there is an animation in this message
                 if (updateMessage.Animation != null)
@@ -350,7 +353,26 @@ namespace PlzOpenMe.Controllers
                         }
                         
                         // we succeeded so add the file to the array
-                        files.Add(temp);
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.Animation.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.Animation.Thumb.FileId, updateMessage.Animation.Thumb.FileUniqueId,
+                                updateMessage.Animation.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Animation.FileName + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -386,8 +408,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.Audio.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.Audio.Thumb.FileId, updateMessage.Audio.Thumb.FileUniqueId,
+                                updateMessage.Audio.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Audio.Title + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -423,8 +464,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.Document.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.Document.Thumb.FileId, updateMessage.Document.Thumb.FileUniqueId,
+                                updateMessage.Document.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Document.FileName + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -442,49 +502,78 @@ namespace PlzOpenMe.Controllers
                 // see if there are any photos in this message
                 if (updateMessage.Photo != null)
                 {
-                    bool errors = false;
-                    
-                    // try to save every photo
-                    foreach (PhotoSize photoSize in updateMessage.Photo)
-                    {
-                        try
-                        {
-                            // attempt to save the file
-                            UploadedFile temp = SaveOrFindFile(photoSize.FileId, photoSize.FileUniqueId,
-                                photoSize.FileSize, "image", "Photo",
-                                DateTime.Now.ToString("O"), updateFrom.Id);
+                    PhotoSize original = new PhotoSize();
+                    PhotoSize thumb = new PhotoSize();
 
-                            // see if we actually saved the file
-                            if (temp == null)
-                            {
-                                // we failed to upload the file
-                                _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                    $"Sorry but there was an error while attempting to save this file. " +
-                                    $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                    ParseMode.Default, false, false, updateMessage.MessageId);
-                                return Json(false);
-                            }
-                            
-                            // we succeeded so add the file to the array
-                            files.Add(temp);
-                        }
-                        catch (Exception ex)
+                    // find the largest
+                    foreach (PhotoSize size in updateMessage.Photo)
+                    {
+                        if (original.FileSize > size.FileSize)
                         {
-                            // there was an error while trying to save the file
-                            Log.Error(ex,
-                                $"Fatal error occured while saving {photoSize.FileId} for user {updateFrom.Id}");
-                            errors = true;
+                            original = size;
+                            thumb = size;
                         }
                     }
-
-                    // we will respond with a message if there were any failures with any of the photos
-                    if (errors)
+                    
+                    // find the smallest
+                    foreach (PhotoSize size in updateMessage.Photo)
                     {
+                        if (thumb.FileSize < size.FileSize)
+                        {
+                            thumb = size;
+                        }
+                    }
+                    
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(original.FileId, original.FileUniqueId,
+                            original.FileSize, "image/img", "Photo",
+                            DateTime.Now.ToString("O"), updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (original.FileUniqueId != thumb.FileUniqueId)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(thumb.FileId, thumb.FileUniqueId,
+                                thumb.FileSize, "image/thumbnail", "Photo",
+                                DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.Document.FileId} for user {updateFrom.Id}");
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                            $"Sorry but there was a fatal error while trying to save one or more of the images attached to this message.  " +
-                            $"If any where successfully I will still be able to get you a link. " +
+                            $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
                             ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
                     }
                 }
                 
@@ -641,113 +730,66 @@ namespace PlzOpenMe.Controllers
                 // if we have a file we can work with, here is where we do it
                 if (files.Count > 0)
                 {
-                    // is there more than one file
-                    if (files.Count > 1)
+                    try
                     {
-                        try
-                        {
-                            // there are multiple files
-                            // set up a couple variables
-                            string collection = MakeCollection();
-                            List<PomLink> links = new List<PomLink>();
+                        // there are multiple files
+                        // set up a couple variables
+                        List<PomLink> links = new List<PomLink>();
 
-                            foreach (UploadedFile file in files)
-                            {
-                                // create the new link
-                                PomLink newLink = new PomLink()
-                                {
-                                    UserId = updateFrom.Id,
-                                    AddedOn = DateTime.Now,
-                                    File = file.Id,
-                                    Link = MakeLink(),
-                                    Views = 0,
-                                    Name = file.Name,
-                                    Collection = collection
-                                };
-                                links.Add(newLink);
-                                Log.Information($"Adding {newLink.Link} to {collection}");
-                            }
-
-                            // save the links to the db
-                            _dbContext.PomLinks.AddRange(links.ToArray());
-                            int linkResult = _dbContext.SaveChanges();
-                            Log.Information(
-                                $"New collection \"{collection}\" created for {updateFrom.Id} with result {linkResult}");
-
-                            // send the success message
-                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                $"{_configuration.GetValue<string>("LiveUrl")}pallet/{collection}",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
-                            return Json(true);
-                        }
-                        catch (Exception ex)
-                        {
-                            // there was an error
-                            // lets make a list of all the files in this collection
-                            string tempIds = "";
-                            foreach (UploadedFile file in files)
-                            {
-                                tempIds += file.Id + ",";
-                            }
-
-                            // clean it up real quick
-                            tempIds = tempIds.Trim(',');
-
-                            // log the error
-                            Log.Error(ex,
-                                $"There was an error while trying to create a new collection for {updateFrom.Id} with the files {tempIds}");
-
-                            // report the error to the user
-                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                $"Sorry, there was an unexpected error while trying to build the pallet. " +
-                                $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
-                            return Json(false);
-                        }
-                    }
-                    else
-                    {
-                        // there was only one file
-                        try
+                        foreach (UploadedFile file in files)
                         {
                             // create the new link
                             PomLink newLink = new PomLink()
                             {
                                 UserId = updateFrom.Id,
                                 AddedOn = DateTime.Now,
-                                File = files[0].Id,
+                                File = file.Id,
                                 Link = MakeLink(),
                                 Views = 0,
-                                Name = files[0].Name
+                                Name = file.Name,
+                                Collection = collection
                             };
-
-                            // save the link
-                            _dbContext.PomLinks.Add(newLink);
-                            int linkResult = _dbContext.SaveChanges();
-                            Log.Information(
-                                $"New link \"{newLink.Link}\" created for {updateFrom.Id} with result {linkResult}");
-
-                            // send the success message
-                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                $"{_configuration.GetValue<string>("LiveUrl")}box/{newLink.Link}",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
-                            return Json(true);
+                            links.Add(newLink);
+                            Log.Information($"Adding {newLink.Link} to {collection}");
                         }
-                        catch (Exception ex)
-                        {
-                            // log the error
-                            Log.Error(ex,
-                                $"There was an error while trying to create a new link for {updateFrom.Id} with " +
-                                $"file {files[0].Id}");
 
-                            // report the error to the user
-                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                $"Sorry, there was an unexpected error while trying to build the package. " +
-                                $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
-                            return Json(true);
-                        }
+                        // save the links to the db
+                        _dbContext.PomLinks.AddRange(links.ToArray());
+                        int linkResult = _dbContext.SaveChanges();
+                        Log.Information(
+                            $"New collection \"{collection}\" created for {updateFrom.Id} with result {linkResult}");
+
+                        // send the success message
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"{_configuration.GetValue<string>("LiveUrl")}pallet/{collection}",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(true);
                     }
+                    catch (Exception ex)
+                    {
+                        // there was an error
+                        // lets make a list of all the files in this collection
+                        string tempIds = "";
+                        foreach (UploadedFile file in files)
+                        {
+                            tempIds += file.Id + ",";
+                        }
+
+                        // clean it up real quick
+                        tempIds = tempIds.Trim(',');
+
+                        // log the error
+                        Log.Error(ex,
+                            $"There was an error while trying to create a new collection for {updateFrom.Id} with the files {tempIds}");
+
+                        // report the error to the user
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry, there was an unexpected error while trying to build the pallet. " +
+                            $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                
                 }
 
                 // placeholder response
@@ -928,52 +970,7 @@ namespace PlzOpenMe.Controllers
             // failed to make a new link
             throw new DataException("Max number of attempts to generate a unique links reached");
         }
-
-        /// <summary>
-        /// generate a unique link to a collection
-        /// </summary>
-        /// <returns>unique collection string</returns>
-        /// <exception cref="DataException">failed to generate new collection string</exception>
-        private string MakeCollection()
-        {
-            // make a couple of variables
-            string rtn = "";
-            bool unique = false;
-            int maxAttempts = 999;
-            int attempt = 0;
-
-            // try to make a unique string
-            while (!unique && attempt <= maxAttempts)
-            {
-                // make the string
-                rtn = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("PalletLength"));
-
-                // built the query
-                var collectionQuery = from cl in _dbContext.PomLinks
-                    where cl.Link == rtn
-                    select cl;
-
-                // is it unique
-                if (collectionQuery.Any())
-                {
-                    attempt++;
-                }
-                else
-                {
-                    unique = true;
-                }
-            }
-
-            // did we make a new collection
-            if (unique)
-            {
-                // yes so return it
-                return rtn;
-            }
-
-            // failed to make a new collection
-            throw new DataException("Max number of attempts to generate a unique collection reached");
-        }
+        
 
         /// <summary>
         /// Download a file from telegram and scan it for viruses

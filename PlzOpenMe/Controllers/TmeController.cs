@@ -580,12 +580,10 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
-                        Log.Information($"Sticker name: {updateMessage.Sticker.SetName} {updateMessage.Sticker.Emoji}");
-                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Sticker.FileId, updateMessage.Sticker.FileUniqueId,
                             updateMessage.Sticker.FileSize, "image/sticker", "Sticker",
-                            updateMessage.Sticker.SetName, updateFrom.Id);
+                            updateMessage.Sticker.SetName + " | " + updateMessage.Sticker.Emoji, updateFrom.Id);
 
                         // see if we actually saved the file
                         if (temp == null)
@@ -608,7 +606,7 @@ namespace PlzOpenMe.Controllers
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
                                 updateMessage.Sticker.Thumb.FileSize, "image/thumbnail", "Photo",
-                                updateMessage.Sticker.SetName + "-thumb", updateFrom.Id);
+                                updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
                             if (temp != null)

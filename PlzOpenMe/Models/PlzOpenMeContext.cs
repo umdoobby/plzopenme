@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -26,7 +25,7 @@ namespace PlzOpenMe.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                throw new NotImplementedException("Database not configured");
+                throw new NotImplementedException("Database connection not set up");
             }
         }
 
@@ -107,15 +106,15 @@ namespace PlzOpenMe.Models
                     .IsRequired()
                     .HasColumnType("varchar(15)")
                     .HasComment("POM link to file")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_bin");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnType("text")
+                    .HasColumnType("mediumtext")
                     .HasComment("Telegram name of file")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_bin");
 
                 entity.Property(e => e.RemovedOn)
                     .HasColumnType("datetime")

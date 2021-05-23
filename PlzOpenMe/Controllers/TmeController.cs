@@ -438,7 +438,203 @@ namespace PlzOpenMe.Controllers
                         return Json(false);
                     }
                 }
+                
+                // see if there are any photos in this message
+                if (updateMessage.Photo != null)
+                {
+                    bool errors = false;
+                    
+                    // try to save every photo
+                    foreach (PhotoSize photoSize in updateMessage.Photo)
+                    {
+                        try
+                        {
+                            // attempt to save the file
+                            UploadedFile temp = SaveOrFindFile(photoSize.FileId, photoSize.FileUniqueId,
+                                photoSize.FileSize, "image", "Photo",
+                                DateTime.Now.ToString("O"), updateFrom.Id);
 
+                            // see if we actually saved the file
+                            if (temp == null)
+                            {
+                                // we failed to upload the file
+                                _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                    $"Sorry but there was an error while attempting to save this file. " +
+                                    $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                    ParseMode.Default, false, false, updateMessage.MessageId);
+                                return Json(false);
+                            }
+                            
+                            // we succeeded so add the file to the array
+                            files.Add(temp);
+                        }
+                        catch (Exception ex)
+                        {
+                            // there was an error while trying to save the file
+                            Log.Error(ex,
+                                $"Fatal error occured while saving {photoSize.FileId} for user {updateFrom.Id}");
+                            errors = true;
+                        }
+                    }
+
+                    // we will respond with a message if there were any failures with any of the photos
+                    if (errors)
+                    {
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save one or more of the images attached to this message.  " +
+                            $"If any where successfully I will still be able to get you a link. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                    }
+                }
+                
+                // see if there is a sticker in this message
+                if (updateMessage.Sticker != null)
+                {
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(updateMessage.Sticker.FileId, updateMessage.Sticker.FileUniqueId,
+                            updateMessage.Sticker.FileSize, "image/sticker", "Sticker",
+                            updateMessage.Sticker.SetName + " | " + updateMessage.Sticker.Emoji, updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so add the file to the array
+                        files.Add(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.Sticker.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save that file. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                }
+                
+                // see if there is a video in this message
+                if (updateMessage.Video != null)
+                {
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(updateMessage.Video.FileId, updateMessage.Video.FileUniqueId,
+                            updateMessage.Video.FileSize, updateMessage.Video.MimeType, "Video",
+                            "", updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so add the file to the array
+                        files.Add(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.Video.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save that file. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                }
+                
+                // see if there is a video note in this message
+                if (updateMessage.VideoNote != null)
+                {
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(updateMessage.VideoNote.FileId, updateMessage.VideoNote.FileUniqueId,
+                            updateMessage.VideoNote.FileSize, "video/note", "VideoNote",
+                            DateTime.Now.ToString("O"), updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so add the file to the array
+                        files.Add(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.VideoNote.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save that file. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                }
+                
+                // see if there is a voice in this message
+                if (updateMessage.Voice != null)
+                {
+                    try
+                    {
+                        // attempt to save the file
+                        UploadedFile temp = SaveOrFindFile(updateMessage.Voice.FileId, updateMessage.Voice.FileUniqueId,
+                            updateMessage.Voice.FileSize, updateMessage.Voice.MimeType, "Voice",
+                            DateTime.Now.ToString("O"), updateFrom.Id);
+
+                        // see if we actually saved the file
+                        if (temp == null)
+                        {
+                            // we failed to upload the file
+                            _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                                $"Sorry but there was an error while attempting to save this file. " +
+                                $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
+                                ParseMode.Default, false, false, updateMessage.MessageId);
+                            return Json(false);
+                        }
+                        
+                        // we succeeded so add the file to the array
+                        files.Add(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        // there was an error while trying to save the file
+                        Log.Error(ex,
+                            $"Fatal error occured while saving {updateMessage.Voice.FileId} for user {updateFrom.Id}");
+                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            $"Sorry but there was a fatal error while trying to save that file. " +
+                            $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
+                            ParseMode.Default, false, false, updateMessage.MessageId);
+                        return Json(false);
+                    }
+                }
 
 
 

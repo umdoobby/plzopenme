@@ -388,7 +388,7 @@ namespace PlzOpenMe.Controllers
                 }
 
                 // see if there is audio in this message
-                if (updateMessage.Audio != null)
+                if (!foundFile && updateMessage.Audio != null)
                 {
                     try
                     {
@@ -444,7 +444,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there is a document in this message
-                if (updateMessage.Document != null)
+                if (!foundFile && updateMessage.Document != null)
                 {
                     try
                     {
@@ -500,7 +500,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there are any photos in this message
-                if (updateMessage.Photo != null)
+                if (!foundFile && updateMessage.Photo != null)
                 {
                     PhotoSize original = new PhotoSize();
                     PhotoSize thumb = new PhotoSize();
@@ -578,7 +578,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there is a sticker in this message
-                if (updateMessage.Sticker != null)
+                if (!foundFile && updateMessage.Sticker != null)
                 {
                     try
                     {
@@ -598,8 +598,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.Sticker.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
+                                updateMessage.Sticker.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -615,7 +634,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there is a video in this message
-                if (updateMessage.Video != null)
+                if (!foundFile && updateMessage.Video != null)
                 {
                     try
                     {
@@ -635,8 +654,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.Video.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.Video.Thumb.FileId, updateMessage.Video.Thumb.FileUniqueId,
+                                updateMessage.Video.Thumb.FileSize, "image/thumbnail", "Photo",
+                                DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -652,7 +690,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there is a video note in this message
-                if (updateMessage.VideoNote != null)
+                if (!foundFile && updateMessage.VideoNote != null)
                 {
                     try
                     {
@@ -672,8 +710,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // is there a thumbnail
+                        if (updateMessage.VideoNote.Thumb != null)
+                        {
+                            // we have a thumbnail, lets try to save that too
+                            temp = SaveOrFindFile(updateMessage.VideoNote.Thumb.FileId, updateMessage.VideoNote.Thumb.FileUniqueId,
+                                updateMessage.VideoNote.Thumb.FileSize, "image/thumbnail", "Photo",
+                                DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
+                            
+                            // see if we actually saved the file
+                            if (temp != null)
+                            {
+                                newThumb = temp;
+                                foundThumb = true;
+                            }
+                            
+                            // if we failed to save the thumbnail, just continue, im just not that worried about it
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -689,7 +746,7 @@ namespace PlzOpenMe.Controllers
                 }
                 
                 // see if there is a voice in this message
-                if (updateMessage.Voice != null)
+                if (!foundFile && updateMessage.Voice != null)
                 {
                     try
                     {
@@ -710,7 +767,12 @@ namespace PlzOpenMe.Controllers
                         }
                         
                         // we succeeded so add the file to the array
-                        files.Add(temp);
+                        // we succeeded so grab the file
+                        newFile = temp;
+                        foundFile = true;
+                        
+                        // there is never a thumbnail with voice
+                        foundThumb = false;
                     }
                     catch (Exception ex)
                     {
@@ -725,66 +787,49 @@ namespace PlzOpenMe.Controllers
                     }
                 }
 
-
-
                 // if we have a file we can work with, here is where we do it
-                if (files.Count > 0)
+                if (foundFile)
                 {
                     try
                     {
                         // there are multiple files
                         // set up a couple variables
                         List<PomLink> links = new List<PomLink>();
-
-                        foreach (UploadedFile file in files)
+                        
+                        // create the new link
+                        PomLink newLink = new PomLink()
                         {
-                            // create the new link
-                            PomLink newLink = new PomLink()
-                            {
-                                UserId = updateFrom.Id,
-                                AddedOn = DateTime.Now,
-                                File = file.Id,
-                                Link = MakeLink(),
-                                Views = 0,
-                                Name = file.Name,
-                                Collection = collection
-                            };
-                            links.Add(newLink);
-                            Log.Information($"Adding {newLink.Link} to {collection}");
-                        }
+                            UserId = updateFrom.Id,
+                            AddedOn = DateTime.Now,
+                            File = newFile.Id,
+                            Link = MakeLink(),
+                            Views = 0,
+                            Name = newFile.Name,
+                            Thumbnail = foundThumb? newThumb.Id : null
+                        };
+                        links.Add(newLink);
 
                         // save the links to the db
                         _dbContext.PomLinks.AddRange(links.ToArray());
                         int linkResult = _dbContext.SaveChanges();
                         Log.Information(
-                            $"New collection \"{collection}\" created for {updateFrom.Id} with result {linkResult}");
+                            $"New link \"{newLink.Link}\" created for {updateFrom.Id} with result {linkResult}");
 
                         // send the success message
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                            $"{_configuration.GetValue<string>("LiveUrl")}pallet/{collection}",
+                            $"{_configuration.GetValue<string>("LiveUrl")}file/{newLink.Link}",
                             ParseMode.Default, false, false, updateMessage.MessageId);
                         return Json(true);
                     }
                     catch (Exception ex)
                     {
-                        // there was an error
-                        // lets make a list of all the files in this collection
-                        string tempIds = "";
-                        foreach (UploadedFile file in files)
-                        {
-                            tempIds += file.Id + ",";
-                        }
-
-                        // clean it up real quick
-                        tempIds = tempIds.Trim(',');
-
-                        // log the error
+                        // there was an error log the error
                         Log.Error(ex,
-                            $"There was an error while trying to create a new collection for {updateFrom.Id} with the files {tempIds}");
+                            $"There was an error while trying to create the link for {updateFrom.Id} with the file {newFile.Id}");
 
                         // report the error to the user
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                            $"Sorry, there was an unexpected error while trying to build the pallet. " +
+                            $"Sorry, there was an unexpected error while trying to create the link. " +
                             $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.",
                             ParseMode.Default, false, false, updateMessage.MessageId);
                         return Json(false);

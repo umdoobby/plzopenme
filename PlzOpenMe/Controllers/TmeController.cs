@@ -502,6 +502,8 @@ namespace PlzOpenMe.Controllers
                 // see if there are any photos in this message
                 if (!foundFile && updateMessage.Photo != null)
                 {
+                    Log.Information($"Found photo array {updateMessage.Photo.Length}");
+                    
                     PhotoSize original = new PhotoSize();
                     PhotoSize thumb = new PhotoSize();
 

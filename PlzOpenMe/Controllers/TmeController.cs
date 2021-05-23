@@ -568,7 +568,7 @@ namespace PlzOpenMe.Controllers
                     {
                         // there was an error while trying to save the file
                         Log.Error(ex,
-                            $"Fatal error occured while saving {updateMessage.Document.FileId} for user {updateFrom.Id}");
+                            $"Fatal error occured while saving {original.FileId} for user {updateFrom.Id}");
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
@@ -793,24 +793,26 @@ namespace PlzOpenMe.Controllers
                     try
                     {
                         // there are multiple files
-                        // set up a couple variables
-                        List<PomLink> links = new List<PomLink>();
-                        
                         // create the new link
-                        PomLink newLink = new PomLink()
+                        PomLink newLink = new PomLink();
+                        
+                        newLink = new PomLink()
                         {
                             UserId = updateFrom.Id,
                             AddedOn = DateTime.Now,
                             File = newFile.Id,
                             Link = MakeLink(),
                             Views = 0,
-                            Name = newFile.Name,
-                            Thumbnail = foundThumb? newThumb.Id : null
+                            Name = newFile.Name
                         };
-                        links.Add(newLink);
+
+                        if (foundThumb)
+                        {
+                            newLink.Thumbnail = newThumb.Id;
+                        }
 
                         // save the links to the db
-                        _dbContext.PomLinks.AddRange(links.ToArray());
+                        _dbContext.PomLinks.Add(newLink);
                         int linkResult = _dbContext.SaveChanges();
                         Log.Information(
                             $"New link \"{newLink.Link}\" created for {updateFrom.Id} with result {linkResult}");

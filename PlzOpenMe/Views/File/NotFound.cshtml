@@ -1,0 +1,16 @@
+﻿@model NotFoundViewModel
+
+@{
+    ViewBag.Title = $"Error {Model.ErrorCode}";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="card border-danger mb-3">
+      <div class="card-header">Error @Model.ErrorCode</div>
+      <div class="card-body text-danger">
+        <h5 class="card-title">@Model.ErrorTitle</h5>
+        <p class="card-text">@Model.ErrorDetail</p>
+      </div>
+    </div>
+</div>

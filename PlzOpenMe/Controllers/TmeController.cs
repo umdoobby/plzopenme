@@ -14,6 +14,7 @@ using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using JsonSerializer = Newtonsoft.Json;
 
 namespace PlzOpenMe.Controllers
@@ -169,6 +170,10 @@ namespace PlzOpenMe.Controllers
                 // if they want to start the service
                 if (updateMessage.Text.StartsWith("/start"))
                 {
+                    List<KeyboardButton> replyOptions = new List<KeyboardButton>();
+                    replyOptions.Add(new KeyboardButton("I Agree"));
+                    replyOptions.Add(new KeyboardButton("Stop"));
+                    
                     // respond with the agreement message
                     _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                         "To start sharing files, I just need to you to do one thing.\n" +
@@ -176,9 +181,11 @@ namespace PlzOpenMe.Controllers
                         "allowed to share, what I'm willing to accept, and what I do with your information.\n" +
                         "Please read these two pages; https://plzopen.me/Home/Privacy and " +
                         "https://plzopen.me/Home/Terms.\n\n" +
-                        "Respond with /agree to say that you have read, understand, and agree to the PlzOpen.Me " +
-                        "privacy policy and terms of service. If you do not agree, respond with /stop and I " +
-                        "will delete any information I have collected about your Telegram account from my database.");
+                        "Select \"I Agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
+                        "privacy policy and terms of service. If you do not agree, choose \"Stop\" and I " +
+                        "will delete any information I have collected about your Telegram account from my database.",
+                        ParseMode.Default,false,false,0,
+                        new ReplyKeyboardMarkup(replyOptions, true, true));
                     return Json(true);
                 }
 

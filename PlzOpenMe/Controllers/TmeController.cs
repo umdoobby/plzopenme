@@ -580,6 +580,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Information($"Sticker name: {updateMessage.Sticker.SetName} {updateMessage.Sticker.Emoji}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Sticker.FileId, updateMessage.Sticker.FileUniqueId,
                             updateMessage.Sticker.FileSize, "image/sticker", "Sticker",

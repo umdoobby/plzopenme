@@ -518,7 +518,7 @@ namespace PlzOpenMe.Controllers
                     // find the smallest
                     foreach (PhotoSize size in updateMessage.Photo)
                     {
-                        if (thumb.FileSize < size.FileSize)
+                        if (thumb.FileSize <= size.FileSize)
                         {
                             thumb = size;
                         }

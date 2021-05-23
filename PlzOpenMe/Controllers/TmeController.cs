@@ -987,7 +987,7 @@ namespace PlzOpenMe.Controllers
             while (!unique && attempt <= maxAttempts)
             {
                 // make the string
-                rtn = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("BoxLength"));
+                rtn = KeyGenerator.GetUniqueKey(_configuration.GetValue<int>("LinkLength"));
 
                 // built the query
                 var linkQuery = from fl in _dbContext.PomLinks

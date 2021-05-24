@@ -397,6 +397,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the animation thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.Animation.Thumb.Height,
+                                    Width = updateMessage.Animation.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for animation thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -468,6 +479,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the audio thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.Audio.Thumb.Height,
+                                    Width = updateMessage.Audio.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for audio thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -530,6 +552,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the document thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.Document.Thumb.Height,
+                                    Width = updateMessage.Document.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                int detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for document thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -625,6 +658,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the photo thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = thumb.Height,
+                                    Width = thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for photo thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -693,6 +737,7 @@ namespace PlzOpenMe.Controllers
                         if (updateMessage.Sticker.Thumb != null)
                         {
                             // we have a thumbnail, lets try to save that too
+                            // these can be either a jpg or a webp, for right now we are just going to assume jpeg
                             temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
                                 updateMessage.Sticker.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
@@ -702,6 +747,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the audio thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.Sticker.Thumb.Height,
+                                    Width = updateMessage.Sticker.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for sticker thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -773,6 +829,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the video thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.Video.Thumb.Height,
+                                    Width = updateMessage.Video.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for video thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it
@@ -843,6 +910,17 @@ namespace PlzOpenMe.Controllers
                             {
                                 newThumb = temp;
                                 foundThumb = true;
+                                
+                                // attempt to add the video notes thumbnails details
+                                _dbContext.PomPhotos.Add(new PomPhoto()
+                                {
+                                    FileId = temp.Id,
+                                    Height = updateMessage.VideoNote.Thumb.Height,
+                                    Width = updateMessage.VideoNote.Thumb.Width,
+                                    IsThumbnail = true
+                                });
+                                detailSave = _dbContext.SaveChanges();
+                                Log.Information($"Details for video note thumbnail {temp.Id} saved with result {detailSave}");
                             }
                             
                             // if we failed to save the thumbnail, just continue, im just not that worried about it

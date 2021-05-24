@@ -131,6 +131,10 @@ namespace PlzOpenMe.Controllers
                             $"There was an error while trying to create the user for {updateFrom.Id}/{updateFrom.Username}");
                         return Json(false);
                     }
+                    
+                    List<KeyboardButton> replyOptions = new List<KeyboardButton>();
+                    replyOptions.Add(new KeyboardButton("I agree"));
+                    replyOptions.Add(new KeyboardButton("Stop"));
 
                     // respond with the agreement message
                     _bot.SendTextMessageAsync(updateMessage.Chat.Id,
@@ -139,9 +143,11 @@ namespace PlzOpenMe.Controllers
                         "allowed to share, what I'm willing to accept, and what I do with your information.\n" +
                         "Please read these two pages; https://plzopen.me/Home/Privacy and " +
                         "https://plzopen.me/Home/Terms.\n\n" +
-                        "Respond with /agree to say that you have read, understand, and agree to the PlzOpen.Me " +
-                        "privacy policy and terms of service. If you do not agree, respond with /stop and I will " +
-                        "delete any information I have collected about your Telegram account.");
+                        "Respond with \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
+                        "privacy policy and terms of service. If you do not agree, respond with \"Stop\" and I will " +
+                        "delete any information I have collected about your Telegram account.",
+                        ParseMode.Default,false,false,0,
+                        new ReplyKeyboardMarkup(replyOptions, true, true));
                     return Json(true);
                 }
 
@@ -171,7 +177,7 @@ namespace PlzOpenMe.Controllers
                 if (updateMessage.Text.StartsWith("/start"))
                 {
                     List<KeyboardButton> replyOptions = new List<KeyboardButton>();
-                    replyOptions.Add(new KeyboardButton("I Agree"));
+                    replyOptions.Add(new KeyboardButton("I agree"));
                     replyOptions.Add(new KeyboardButton("Stop"));
                     
                     // respond with the agreement message
@@ -181,7 +187,7 @@ namespace PlzOpenMe.Controllers
                         "allowed to share, what I'm willing to accept, and what I do with your information.\n" +
                         "Please read these two pages; https://plzopen.me/Home/Privacy and " +
                         "https://plzopen.me/Home/Terms.\n\n" +
-                        "Select \"I Agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
+                        "Select \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
                         "privacy policy and terms of service. If you do not agree, choose \"Stop\" and I " +
                         "will delete any information I have collected about your Telegram account from my database.",
                         ParseMode.Default,false,false,0,
@@ -260,13 +266,11 @@ namespace PlzOpenMe.Controllers
                             "set it up for you to share. When I'm done packaging it, I will respond with a URL that you can share with " +
                             "anyone, over any messaging platform. It doesn't matter if you are forwarding me a message from a group, " +
                             "another bot, a direct message, or you sent me it directly. I will always try to grab that file, repack it " +
-                            "and give you a sharable URL.");
-                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            "and give you a sharable URL.\n\n" +
                             "Also if you are interested in my development, how I work, or just generally curious; I'm open source! " +
                             "You can see issues, upcoming features, recommend new features, report bugs, etc at my GitHub repository!\n" +
                             "https://github.com/umdoobby/plzopenme \n" +
-                            "If you really like me, maybe give me a star and/or a watch on there as well? No pressure though.");
-                        _bot.SendTextMessageAsync(updateMessage.Chat.Id,
+                            "If you really like me, maybe give me a star and/or a watch on there as well? No pressure though.\n\n" +
                             "Finally, you might want to consider joining my update channel.\n" +
                             "https://t.me/pomUpdates\n" +
                             "That's where I announce new features, major issues, etc. In case you want to hear about the latest " +
@@ -318,12 +322,14 @@ namespace PlzOpenMe.Controllers
                     // respond with banned message
                     _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                         $"I'm sorry but your account was banned from PlzOpen.Me on {fromUser.BannedOn.Value.ToString("F")}.");
-                    return Json(true);
                 }
 
                 // respond with banned message
                 _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                     $"I'm sorry but your account was banned from PlzOpen.Me.");
+
+                // attempt to leave the chat
+                _bot.LeaveChatAsync(updateMessage.Chat.Id);
                 return Json(true);
             }
 
@@ -368,7 +374,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Animation.Thumb.FileId, updateMessage.Animation.Thumb.FileUniqueId,
-                                updateMessage.Animation.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Animation.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 updateMessage.Animation.FileName + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -424,7 +430,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Audio.Thumb.FileId, updateMessage.Audio.Thumb.FileUniqueId,
-                                updateMessage.Audio.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Audio.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 updateMessage.Audio.Title + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -480,7 +486,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Document.Thumb.FileId, updateMessage.Document.Thumb.FileUniqueId,
-                                updateMessage.Document.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Document.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 updateMessage.Document.FileName + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -533,7 +539,7 @@ namespace PlzOpenMe.Controllers
                     {
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(original.FileId, original.FileUniqueId,
-                            original.FileSize, "image/img", "Photo",
+                            original.FileSize, "image/jpg", "Photo",
                             DateTime.Now.ToString("O"), updateFrom.Id);
 
                         // see if we actually saved the file
@@ -556,7 +562,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(thumb.FileId, thumb.FileUniqueId,
-                                thumb.FileSize, "image/thumbnail", "Photo",
+                                thumb.FileSize, "image/jpg", "Thumbnail",
                                 DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -612,7 +618,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
-                                updateMessage.Sticker.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Sticker.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -668,7 +674,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Video.Thumb.FileId, updateMessage.Video.Thumb.FileUniqueId,
-                                updateMessage.Video.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.Video.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -724,7 +730,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.VideoNote.Thumb.FileId, updateMessage.VideoNote.Thumb.FileUniqueId,
-                                updateMessage.VideoNote.Thumb.FileSize, "image/thumbnail", "Photo",
+                                updateMessage.VideoNote.Thumb.FileSize, "image/jpg", "Thumbnail",
                                 DateTime.Now.ToString("O") + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -797,7 +803,6 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
-                        // there are multiple files
                         // create the new link
                         PomLink newLink = new PomLink();
                         

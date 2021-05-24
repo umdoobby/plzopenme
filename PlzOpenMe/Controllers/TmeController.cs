@@ -183,12 +183,12 @@ namespace PlzOpenMe.Controllers
 
                             // respond with success
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                "Awesome! Alright, with that out of the way your officially all set up and I'm ready to help! " +
+                                "Awesome! Alright, with that out of the way you're officially all set up and I'm ready to help! " +
                                 "All you have to do is send me a message with some kind of media attached to it and I will automatically " +
                                 "set it up for you to share. When I'm done packaging it, I will respond with a URL that you can share with " +
                                 "anyone, over any messaging platform. It doesn't matter if you are forwarding me a message from a group, " +
                                 "another bot, a direct message, or you sent me it directly. I will always try to grab that file, repack it " +
-                                "and give you a sharable URL.\n\n" +
+                                "and give you a sharable URL. However, know that Telegram won't let me download any files over 20MB.\n\n" +
                                 "Also if you are interested in my development, how I work, or just generally curious; I'm open source! " +
                                 "You can see issues, upcoming features, recommend new features, report bugs, etc at my GitHub repository!\n" +
                                 "https://github.com/umdoobby/plzopenme \n" +
@@ -204,7 +204,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // for some reason we failed update the user
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                "This is embarrassing... I encountered an error trying to handle your request. I have alerted by sysadmin about the failure, please try again in a few minutes.");
+                                "This is embarrassing... I encountered an error trying to handle your request. I have alerted my admin about the failure, please try again in a few minutes.");
                             Log.Error(e,
                                 $"There was an error while attempting to save the agreement details of user {updateFrom.Id}/{updateFrom.Username}");
                             return Json(false);
@@ -233,7 +233,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // for some reason we failed to remove the user
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                                "This is embarrassing... I encountered an error trying to handle your request. I have alerted by sysadmin about the failure, please try again in a few minutes.");
+                                "This is embarrassing... I encountered an error trying to handle your request. I have alerted my admin about the failure, please try again in a few minutes.");
                             Log.Error(e,
                                 $"There was an error while attempting to remove user {updateFrom.Id}/{updateFrom.Username}");
                             return Json(false);
@@ -306,7 +306,7 @@ namespace PlzOpenMe.Controllers
                     $"The user {updateFrom.Id}/{updateFrom.Username} was blocked with agreement status {fromUser.Agreed.Value}");
                 _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                     "I'm sorry but you did not agree to my Terms of Service and my Privacy Policy. " +
-                    "There is nothing more that I can do for you. If you believe you are getting this message in error, please report it " +
+                    "There is nothing more that I can do for you until you review those and agree. If you believe you are getting this message in error, please report it " +
                     "in my GitHub at https://github.com/umdoobby/plzopenme. Sorry I can't be more help.");
                 return Json(true);
             }
@@ -350,6 +350,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted an animation ID={updateMessage.Animation.FileId} FuID={updateMessage.Animation.FileUniqueId}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Animation.FileId, updateMessage.Animation.FileUniqueId,
                             updateMessage.Animation.FileSize, updateMessage.Animation.MimeType, "Animation",
@@ -358,6 +360,7 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save an animation for user {updateFrom.Id} file ID={updateMessage.Animation.FileId} FuID={updateMessage.Animation.FileUniqueId}");
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -365,6 +368,17 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+                        
+                        // attempt to add the animations details
+                        _dbContext.PomAnimations.Add(new PomAnimation()
+                        {
+                            Duration = updateMessage.Animation.Duration,
+                            Height = updateMessage.Animation.Height,
+                            Width = updateMessage.Animation.Width,
+                            FileId = temp.Id
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for animation {temp.Id} saved with result {detailSave}");
                         
                         // we succeeded so add the file to the array
                         newFile = temp;
@@ -406,6 +420,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted an audio file ID={updateMessage.Audio.FileId} FuID={updateMessage.Audio.FileUniqueId}");
+
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Audio.FileId, updateMessage.Audio.FileUniqueId,
                             updateMessage.Audio.FileSize, updateMessage.Audio.MimeType, "Audio",
@@ -414,6 +430,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save an audio file for user {updateFrom.Id} file ID={updateMessage.Audio.FileId} FuID={updateMessage.Audio.FileUniqueId}");
+                            
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -421,6 +439,17 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+
+                        // attempt to save the audio files details
+                        _dbContext.PomAudios.Add(new PomAudio()
+                        {
+                            Duration = updateMessage.Audio.Duration,
+                            FileId = temp.Id,
+                            Performer = updateMessage.Audio.Performer,
+                            Title = updateMessage.Audio.Title
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for audio file {temp.Id} saved with result {detailSave}");
                         
                         // we succeeded so grab the file
                         newFile = temp;
@@ -462,6 +491,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted an audio file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Document.FileId, updateMessage.Document.FileUniqueId,
                             updateMessage.Document.FileSize, updateMessage.Document.MimeType, "Document",
@@ -470,6 +501,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save an audio file for user {updateFrom.Id} file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -477,6 +510,8 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+                        
+                        // there are no details for a generic document file
                         
                         // we succeeded so grab the file
                         newFile = temp;
@@ -516,6 +551,8 @@ namespace PlzOpenMe.Controllers
                 // see if there are any photos in this message
                 if (!foundFile && updateMessage.Photo != null)
                 {
+                    Log.Debug($"UserID={updateFrom.Id} ChatID={updateMessage.MessageId} submitted a photo with {updateMessage.Photo.Length} sizes");
+                    
                     PhotoSize original = new PhotoSize();
                     PhotoSize thumb = new PhotoSize();
 
@@ -528,16 +565,20 @@ namespace PlzOpenMe.Controllers
                         if (size.FileSize == maxSize)
                         {
                             original = size;
+                            Log.Debug($"Original size found for user {updateFrom.Id}/{updateMessage.MessageId} as ID={original.FileId} FuID={original.FileUniqueId}");
                         }
 
                         if (size.FileSize == minSize)
                         {
                             thumb = size;
+                            Log.Debug($"Thumbnail size found for user {updateFrom.Id}/{updateMessage.MessageId} as ID={thumb.FileId} FuID={thumb.FileUniqueId}");
                         }
                     }
                     
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted a photo ID={original.FileId} FuID={original.FileUniqueId}");
+
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(original.FileId, original.FileUniqueId,
                             original.FileSize, "image/jpg", "Photo",
@@ -546,6 +587,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save a photo for user {updateFrom.Id} file ID={original.FileId} FuID={original.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -553,6 +596,17 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+                        
+                        // attempt to save the photo files details
+                        _dbContext.PomPhotos.Add(new PomPhoto()
+                        {
+                            Height = original.Height,
+                            Width = original.Width,
+                            FileId = temp.Id,
+                            IsThumbnail = false
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for photo {temp.Id} saved with result {detailSave}");
                         
                         // we succeeded so grab the file
                         newFile = temp;
@@ -594,6 +648,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted a sticker ID={updateMessage.Sticker.FileId} FuID={updateMessage.Sticker.FileUniqueId}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Sticker.FileId, updateMessage.Sticker.FileUniqueId,
                             updateMessage.Sticker.FileSize, "image/sticker", "Sticker",
@@ -602,6 +658,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save a sticker for user {updateFrom.Id} file ID={updateMessage.Sticker.FileId} FuID={updateMessage.Sticker.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -610,10 +668,27 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
+                        // attempt to save the sticker files details
+                        _dbContext.PomStickers.Add(new PomSticker()
+                        {
+                            Height = updateMessage.Sticker.Height,
+                            Width = updateMessage.Sticker.Width,
+                            Emoji = updateMessage.Sticker.Emoji,
+                            FileId = temp.Id,
+                            SetName = updateMessage.Sticker.SetName,
+                            IsAnimated = updateMessage.Sticker.IsAnimated,
+                            MaskPoint = updateMessage.Sticker.MaskPosition.Point.ToString(),
+                            MaskScale = updateMessage.Sticker.MaskPosition.Scale,
+                            MaskShiftX = updateMessage.Sticker.MaskPosition.XShift,
+                            MaskShiftY = updateMessage.Sticker.MaskPosition.YShift
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for sticker {temp.Id} saved with result {detailSave}");
+                        
                         // we succeeded so grab the file
                         newFile = temp;
                         foundFile = true;
-                        
+
                         // is there a thumbnail
                         if (updateMessage.Sticker.Thumb != null)
                         {
@@ -650,6 +725,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted a video ID={updateMessage.Video.FileId} FuID={updateMessage.Video.FileUniqueId}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Video.FileId, updateMessage.Video.FileUniqueId,
                             updateMessage.Video.FileSize, updateMessage.Video.MimeType, "Video",
@@ -658,6 +735,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save a video for user {updateFrom.Id} file ID={updateMessage.Video.FileId} FuID={updateMessage.Video.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -665,6 +744,17 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+                        
+                        // attempt to save the video files details
+                        _dbContext.PomVideos.Add(new PomVideo()
+                        {
+                            Height = updateMessage.Video.Height,
+                            Width = updateMessage.Video.Width,
+                            Duration = updateMessage.Video.Duration,
+                            FileId = temp.Id
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for video {temp.Id} saved with result {detailSave}");
                         
                         // we succeeded so grab the file
                         newFile = temp;
@@ -706,6 +796,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted a video note ID={updateMessage.VideoNote.FileId} FuID={updateMessage.VideoNote.FileUniqueId}");
+                        
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.VideoNote.FileId, updateMessage.VideoNote.FileUniqueId,
                             updateMessage.VideoNote.FileSize, "video/note", "VideoNote",
@@ -714,6 +806,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save a video note for user {updateFrom.Id} file ID={updateMessage.VideoNote.FileId} FuID={updateMessage.VideoNote.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -721,6 +815,16 @@ namespace PlzOpenMe.Controllers
                                 ParseMode.Default, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
+                        
+                        // attempt to save the video notes details
+                        _dbContext.PomVideoNotes.Add(new PomVideoNote()
+                        {
+                            Length = updateMessage.VideoNote.Length,
+                            Duration = updateMessage.VideoNote.Duration,
+                            FileId = temp.Id
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for video note {temp.Id} saved with result {detailSave}");
                         
                         // we succeeded so grab the file
                         newFile = temp;
@@ -762,6 +866,8 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
+                        Log.Debug($"User {updateFrom.Id} submitted a voice ID={updateMessage.Voice.FileId} FuID={updateMessage.Voice.FileUniqueId}");
+
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Voice.FileId, updateMessage.Voice.FileUniqueId,
                             updateMessage.Voice.FileSize, updateMessage.Voice.MimeType, "Voice",
@@ -770,6 +876,8 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
+                            Log.Warning($"Failed to save a voice for user {updateFrom.Id} file ID={updateMessage.Voice.FileId} FuID={updateMessage.Voice.FileUniqueId}");
+
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
@@ -778,7 +886,15 @@ namespace PlzOpenMe.Controllers
                             return Json(false);
                         }
                         
-                        // we succeeded so add the file to the array
+                        // attempt to save the voice details
+                        _dbContext.PomVoices.Add(new PomVoice()
+                        {
+                            Duration = updateMessage.Voice.Duration,
+                            FileId = temp.Id
+                        });
+                        int detailSave = _dbContext.SaveChanges();
+                        Log.Information($"Details for video note {temp.Id} saved with result {detailSave}");
+                        
                         // we succeeded so grab the file
                         newFile = temp;
                         foundFile = true;
@@ -805,9 +921,7 @@ namespace PlzOpenMe.Controllers
                     try
                     {
                         // create the new link
-                        PomLink newLink = new PomLink();
-                        
-                        newLink = new PomLink()
+                        PomLink newLink =  new PomLink()
                         {
                             UserId = updateFrom.Id,
                             AddedOn = DateTime.Now,

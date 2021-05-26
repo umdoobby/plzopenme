@@ -15,24 +15,22 @@
         <div class="col-md-8">
             <div class="card border-primary mb-3 shadow">
                 <div class="card-body">
-                    <div class="container mx-auto">
-                        <video
-                            id="tme-animation"
-                            class="video-js"
-                            controls
-                            loop
-                            preload="auto"
-                            width="@Model.Animation.Width"
-                            height="@Model.Animation.Height"
-                            poster="/data/@Model.ThumbFile.Location"
-                            data-setup="{}">
-                            <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
-                            <p class="vjs-no-js">
-                                To view this video please enable JavaScript, and consider upgrading to a
-                                web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-                            </p>
-                        </video>
-                    </div>
+                    <video
+                        id="tme-animation"
+                        class="video-js mx-auto shadow"
+                        controls
+                        loop
+                        preload="auto"
+                        width="@Model.Animation.Width"
+                        height="@Model.Animation.Height"
+                        poster="/data/@Model.ThumbFile.Location"
+                        data-setup="{}">
+                        <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+                        </p>
+                    </video>
                 </div>
             </div>
         </div>

@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PlzOpenMe.Models;
+using Serilog;
 
 namespace PlzOpenMe.Controllers
 {
@@ -29,11 +31,157 @@ namespace PlzOpenMe.Controllers
         public IActionResult Index(string id)
         {
             // see if we have a file id
-            if (!String.IsNullOrWhiteSpace(id))
+            if (String.IsNullOrWhiteSpace(id))
             {
-                
+                // a blank ID will get us nowhere, just respond with the error page
+                Log.Warning($"A client attempted to load a file without an ID, responding with error 400");
+                return View("NotFound", new NotFoundViewModel()
+                {
+                    ErrorCode = 400,
+                    ErrorDetail = "This is not a valid link, please double check the URL and try again.",
+                    ErrorTitle = "Bad Request"
+                });
             }
             
+            // so open a query for this id
+            var linkQuery = from lq in _dbContext.PomLinks
+                where lq.Link == id
+                select lq;
+            PomLink foundLink = linkQuery.FirstOrDefault();
+            
+            // if we can't find that link we need to 404
+            if (foundLink == null)
+            {
+                Log.Warning($"A client attempted to load a file with the ID {id} but this link could not be found, responding 404");
+                return View("NotFound", new NotFoundViewModel()
+                {
+                    ErrorCode = 404,
+                    ErrorDetail = "The requested file couldn't be found. It may have been moved or deleted. " +
+                                  "You may want to double check the link and make sure this is the correct URL.",
+                    ErrorTitle = "File Not Found"
+                });
+            }
+            
+            // so we have a link, has this link been deactivated
+            if (foundLink.RemovedOn.HasValue)
+            {
+                Log.Warning($"A client attempted to load a file with the ID {id} but this link was previously removed, responding 404");
+                return View("NotFound", new NotFoundViewModel()
+                {
+                    ErrorCode = 404,
+                    ErrorDetail = "The requested file couldn't be found. It may have been moved or deleted. " +
+                                  "You may want to double check the link and make sure this is the correct URL.",
+                    ErrorTitle = "File Not Found"
+                });
+            }
+            
+            // build the query for the file
+            var fileQuery = from fq in _dbContext.PomFiles
+                where fq.Id == foundLink.File
+                select fq;
+            PomFile foundFile = fileQuery.FirstOrDefault();
+
+            // see if there is a file for this link
+            if (foundFile == null)
+            {
+                Log.Warning($"Link {foundLink.Id} pointed to file {foundLink.File} that doesn't exist, responding 404");
+                return View("NotFound", new NotFoundViewModel()
+                {
+                    ErrorCode = 404,
+                    ErrorDetail = "The requested file couldn't be found. It may have been moved or deleted. " +
+                                  "You may want to double check the link and make sure this is the correct URL.",
+                    ErrorTitle = "File Not Found"
+                });
+            }
+            
+            // see if that file still exists
+            if (foundFile.DeletedOn.HasValue)
+            {
+                Log.Warning($"A client requested file {foundFile.Id} that was previously deleted, responding 404");
+                return View("NotFound", new NotFoundViewModel()
+                {
+                    ErrorCode = 404,
+                    ErrorDetail = "The requested file couldn't be found. It may have been moved or deleted. " +
+                                  "You may want to double check the link and make sure this is the correct URL.",
+                    ErrorTitle = "File Not Found"
+                });
+            }
+            
+            // is there a thumbnail
+            PomFile thumbFile = null;
+            if (foundLink.Thumbnail.HasValue)
+            {
+                // lets try to find the thumbnail, if there is none thumbnail will stay null
+                var thumbQuery = from tq in _dbContext.PomFiles
+                    where tq.Id == foundLink.Thumbnail
+                    select tq;
+                thumbFile = thumbQuery.FirstOrDefault();
+            }
+
+            PomPhoto thumbPhoto = null;
+            if (thumbFile != null)
+            {
+                // so we found a file so we should be able to find a photo entry for it
+                var thumbPhotoQuery = from pq in _dbContext.PomPhotos
+                    where pq.FileId == thumbFile.Id
+                    select pq;
+                thumbPhoto = thumbPhotoQuery.FirstOrDefault();
+            }
+
+            // alright now what version of the page they get depends on the file type
+            switch (foundFile.Type.ToLower())
+            {
+                case "animation":
+                    // get the animations information
+                    var animeQuery = from aq in _dbContext.PomAnimations
+                        where aq.FileId == foundFile.Id
+                        select aq;
+
+                    // return the animation view with all the information we need
+                    return View("Animation", new AnimationViewModel()
+                    {
+                        Animation = animeQuery.FirstOrDefault(),
+                        File = foundFile,
+                        Link = foundLink,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
+                    break;
+                
+                case "audio":
+                    break;
+                
+                case "document":
+                    break;
+                
+                case "photo":
+                    break;
+                
+                case "sticker":
+                    break;
+                
+                case "video":
+                    break;
+                
+                case "videonote":
+                    break;
+                
+                case "voice":
+                    break;
+                
+                default:
+                    // theoretically this should never happen but its here just in case
+                    Log.Error($"Link {foundLink.Id} pointed to file {foundLink.File} has an unexpected file type \"{foundFile.Type}\", responding 500");
+                    return View("NotFound", new NotFoundViewModel()
+                    {
+                        ErrorCode = 500,
+                        ErrorDetail = "The file type of the requested file is invalid. There is no view for the unexpected file type.",
+                        ErrorTitle = "Internal Server Error"
+                    });
+                    break;
+            }
+
+
             return View();
         }
 

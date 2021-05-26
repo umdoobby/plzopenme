@@ -1,0 +1,58 @@
+﻿@model AnimationViewModel
+
+@{
+    ViewBag.Title = Model.Link.Name;
+    Layout = "_Layout";
+    ViewData["Description"] = "Delivery! I have an animation for you fresh from Telegram! Click here to view or download the file.";
+    ViewData["Thumbnail"] = $"data/{Model.ThumbFile.Location}";
+    ViewData["Url"] = $"file/{Model.Link.Link}";
+}
+
+<div class="container">
+    <h2>@Model.Link.Name</h2>
+    <hr class="border-primary mb-3" />
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="card border-primary mb-3">
+                <div class="card-body">
+                    <video
+                        id="tme-animation"
+                        class="video-js"
+                        controls
+                        preload="auto"
+                        width="@Model.Animation.Width"
+                        height="@Model.Animation.Height"
+                        poster="/data/@Model.ThumbFile.Location"
+                        data-setup="{}">
+                        <source src="/data/@Model.File.Location" type="@Model.File.Mime" />
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+                        </p>
+                    </video>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success mb-3">
+                <div class="card-header">Header</div>
+                <div class="card-body">
+                    <h4 class="card-title">Success card title</h4>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Css 
+{
+    <!-- Video.js player style sheet -->
+    <link rel="stylesheet" href="~/lib/videojs/dist/video-js.min.css"/>
+}
+
+@section Scripts
+{
+    <!-- Video.js player script -->
+    <script src="~/lib/videojs/dist/video.min.js"></script>
+}

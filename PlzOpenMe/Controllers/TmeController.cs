@@ -389,7 +389,7 @@ namespace PlzOpenMe.Controllers
                         {
                             // we have a thumbnail, lets try to save that too
                             temp = SaveOrFindFile(updateMessage.Animation.Thumb.FileId, updateMessage.Animation.Thumb.FileUniqueId,
-                                updateMessage.Animation.Thumb.FileSize, "image/jpg", "Thumbnail",
+                                updateMessage.Animation.Thumb.FileSize, "image/jpg", "Photo",
                                 updateMessage.Animation.FileName + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file

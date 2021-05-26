@@ -1022,7 +1022,7 @@ namespace PlzOpenMe.Controllers
 
                         // send the success message
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
-                            $"{_configuration.GetValue<string>("LiveUrl")}file/{newLink.Link}",
+                            $"{_configuration.GetValue<string>("LiveUrl")}File?id={newLink.Link}",
                             ParseMode.Default, false, false, updateMessage.MessageId);
                         return Json(true);
                     }
@@ -1226,10 +1226,10 @@ namespace PlzOpenMe.Controllers
         /// Download a file from telegram and scan it for viruses
         /// </summary>
         /// <param name="name">name for the new file</param>
-        /// <param name="fileId">file id of the file to download</param>
-        /// /// <param name="fileSize">file size in bytes of the file to download</param>
+        /// <param name="filePath">file path of the file to download</param>
+        /// <param name="fileSize">file size in bytes of the file to download</param>
         /// <returns>True for a successful download or false for a filed download</returns>
-        private bool Downloadfile(string name, string fileId, int fileSize)
+        private bool Downloadfile(string name, string filePath, int fileSize)
         {
             bool rtn = false;
 
@@ -1241,9 +1241,6 @@ namespace PlzOpenMe.Controllers
             }
 
             string[] clamAvConnection = _configuration.GetConnectionString("ClamAvServer").Split(':');
-
-            // first get the path from telegram
-            string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
 
             // build the download link
             string download =
@@ -1353,9 +1350,16 @@ namespace PlzOpenMe.Controllers
                         Type = type,
                         UploadedOn = DateTime.Now
                     };
+                    
+                    // Get the path from telegram
+                    string filePath = _bot.GetFileAsync(fileId).Result.FilePath;
+                    
+                    // get the file ext from telegram
+                    string ext = Path.GetExtension(filePath);
+                    newFile.Location += ext;
 
                     // save the file
-                    if (Downloadfile(newFile.Location, newFile.FileId, newFile.Size))
+                    if (Downloadfile(newFile.Location, filePath, newFile.Size))
                     {
                         // we saved the file
                         _dbContext.Add(newFile);

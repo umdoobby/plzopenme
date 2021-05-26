@@ -118,6 +118,7 @@ namespace PlzOpenMe.Controllers
                 thumbFile = thumbQuery.FirstOrDefault();
             }
 
+            // if there is a thumbnail we need to grab its info too
             PomPhoto thumbPhoto = null;
             if (thumbFile != null)
             {
@@ -127,6 +128,12 @@ namespace PlzOpenMe.Controllers
                     select pq;
                 thumbPhoto = thumbPhotoQuery.FirstOrDefault();
             }
+            
+            // we are about to render the page so lets increment the view counter
+            foundLink.Views++;
+            _dbContext.PomLinks.Update(foundLink);
+            int incrementResult = _dbContext.SaveChanges();
+            Log.Information($"Link {foundLink.Id} view count was incremented by one with result {incrementResult}");
 
             // alright now what version of the page they get depends on the file type
             switch (foundFile.Type.ToLower())

@@ -15,30 +15,38 @@
         <div class="col-md-8">
             <div class="card border-primary mb-3">
                 <div class="card-body">
-                    <video
-                        id="tme-animation"
-                        class="video-js"
-                        controls
-                        preload="auto"
-                        width="@Model.Animation.Width"
-                        height="@Model.Animation.Height"
-                        poster="/data/@Model.ThumbFile.Location"
-                        data-setup="{}">
-                        <source src="/data/@Model.File.Location" type="@Model.File.Mime" />
-                        <p class="vjs-no-js">
-                            To view this video please enable JavaScript, and consider upgrading to a
-                            web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-                        </p>
-                    </video>
+                    <div class="container">
+                        <video
+                            id="tme-animation"
+                            class="video-js"
+                            loop
+                            preload="auto"
+                            width="@Model.Animation.Width"
+                            height="@Model.Animation.Height"
+                            poster="/data/@Model.ThumbFile.Location"
+                            data-setup="{}">
+                            <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
+                            <p class="vjs-no-js">
+                                To view this video please enable JavaScript, and consider upgrading to a
+                                web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+                            </p>
+                        </video>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card border-success mb-3">
-                <div class="card-header">Header</div>
+                <div class="card-header"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</div>
                 <div class="card-body">
-                    <h4 class="card-title">Success card title</h4>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <p class="card-text">Views: @Model.Link.Views</p>
+                    <p class="card-text">Uploaded: @Model.Link.AddedOn.ToString("R")</p>
+                    <p class="card-text">Entity: @Model.File.Type</p>
+                    <p class="card-text">MIME type: @Model.File.Mime</p>
+                    <p class="card-text">Size: @Model.File.Size MB</p>
+                    <p class="card-text">Height: @Model.Animation.Height px</p>
+                    <p class="card-text">Width: @Model.Animation.Width px</p>
+                    <p class="card-text">Duration: @Model.Animation.Duration Sec</p>
                 </div>
             </div>
         </div>

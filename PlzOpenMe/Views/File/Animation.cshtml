@@ -110,6 +110,9 @@
             copyText.setSelectionRange(0, 99999); /* For mobile devices */
             document.execCommand("copy");
             copiedToolTip.show();
+            setTimeout(function(){
+                    copiedToolTip.hide();
+                }, 3000);
         } 
     </script>
 }

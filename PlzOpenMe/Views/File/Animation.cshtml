@@ -14,12 +14,13 @@
     <div class="row mb-3">
         <div class="col-md-8">
             <div class="card border-primary mb-3 shadow">
-                <div class="card-body">
+                <div class="card-body vjs-fluid">
                     <video
                         id="tme-animation"
                         class="video-js mx-auto shadow"
                         controls
                         loop
+                        muted
                         preload="auto"
                         width="@Model.Animation.Width"
                         height="@Model.Animation.Height"
@@ -33,16 +34,21 @@
                     </video>
                 </div>
             </div>
+            <label for="permalink" class="form-label"><i class="fas fa-link"></i>&nbsp;Permalink to this file:</label>
+            <div class="input-group mb-3 shadow">
+                <input type="text" class="form-control" id="permalink" placeholder="Permalink" aria-label="PlzOpenMe Permalink">
+                <button class="btn btn-outline-primary" type="button" id="permalink-copy"><i class="fas fa-copy"></i>&nbsp;Copy</button>
+            </div>
         </div>
         <div class="col-md-4">
             <div class="card border-success mb-3 shadow">
                 <div class="card-header"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</div>
-                <div class="card-body">
+                <div class="card-body small">
                     <p class="card-text">Views: @Model.Link.Views</p>
                     <p class="card-text">Uploaded: @Model.Link.AddedOn.ToString("R")</p>
                     <p class="card-text">Entity: @Model.File.Type</p>
                     <p class="card-text">MIME type: @Model.File.Mime</p>
-                    <p class="card-text">Size: @Model.File.Size MB</p>
+                    <p class="card-text">Size: @Model.File.Size Bytes</p>
                     <p class="card-text">Height: @Model.Animation.Height px</p>
                     <p class="card-text">Width: @Model.Animation.Width px</p>
                     <p class="card-text">Duration: @Model.Animation.Duration Sec</p>
@@ -62,4 +68,12 @@
 {
     <!-- Video.js player script -->
     <script src="~/lib/videojs/dist/video.min.js"></script>
+    <script>
+        const videoPlayer = videojs('tme-animation', {
+                    controlBar: {
+                        'pictureInPictureToggle': false,
+                        'volumePanel': false,
+                    }
+                });
+    </script>
 }

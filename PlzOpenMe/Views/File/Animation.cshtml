@@ -37,14 +37,14 @@
             <label for="permalink" class="form-label"><h6><i class="fas fa-link"></i>&nbsp;Permalink to this file:</h6></label>
             <div class="input-group mb-3 shadow">
                 <input type="text" class="form-control user-select-all" id="permalink" placeholder="Permalink" aria-label="PlzOpenMe Permalink" value="https://plzopen.me/File?id=@Model.Link.Link" readonly>
-                <button class="btn btn-outline-primary" type="button" id="permalink-copy" onclick="copyButtonClicked()"><i class="fas fa-copy"></i>&nbsp;Copy</button>
+                <button class="btn btn-outline-info" type="button" id="permalink-copy" onclick="copyButtonClicked()"><i class="fas fa-copy"></i>&nbsp;Copy</button>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card border-success mb-3 shadow">
-                <div class="card-header"><h6><i class="fas fa-clipboard-list"></i>&nbsp;File Details</h6></div>
-                <div class="card-body small">
-                    <ul class="list-group card-text">
+                <div class="card-body">
+                    <h5 class="card-title mb-2"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</h5>
+                    <ul class="list-group-flush card-text">
                         <li class="list-group-item">Views: @Model.Link.Views</li>
                         <li class="list-group-item">Uploaded: @Model.Link.AddedOn.ToString("R")</li>
                         <li class="list-group-item">Entity: @Model.File.Type</li>

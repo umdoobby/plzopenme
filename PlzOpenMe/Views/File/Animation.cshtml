@@ -43,18 +43,18 @@
         <div class="col-md-4">
             <div class="card border-success mb-3 shadow">
                 <div class="card-body">
-                    <h5 class="card-title mb-2"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</h5>
-                    <ul class="list-group-flush card-text">
-                        <li class="list-group-item">Views: @Model.Link.Views</li>
-                        <li class="list-group-item">Uploaded: @Model.Link.AddedOn.ToString("R")</li>
-                        <li class="list-group-item">Entity: @Model.File.Type</li>
-                        <li class="list-group-item">MIME type: @Model.File.Mime</li>
-                        <li class="list-group-item">Size: @Model.File.Size Bytes</li>
-                        <li class="list-group-item">Height: @Model.Animation.Height px</li>
-                        <li class="list-group-item">Width: @Model.Animation.Width px</li>
-                        <li class="list-group-item">Duration: @Model.Animation.Duration Sec</li>
-                    </ul>
+                    <h6 class="card-title mb-2"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</h6>
                 </div>
+                <ul class="list-group list-group-flush card-text small">
+                    <li class="list-group-item">Views: @Model.Link.Views</li>
+                    <li class="list-group-item">Uploaded: @Model.Link.AddedOn.ToString("R")</li>
+                    <li class="list-group-item">Entity: @Model.File.Type</li>
+                    <li class="list-group-item">MIME type: @Model.File.Mime</li>
+                    <li class="list-group-item">Size: @Model.File.Size Bytes</li>
+                    <li class="list-group-item">Height: @Model.Animation.Height px</li>
+                    <li class="list-group-item">Width: @Model.Animation.Width px</li>
+                    <li class="list-group-item">Duration: @Model.Animation.Duration Sec</li>
+                </ul>
             </div>
         </div>
     </div>

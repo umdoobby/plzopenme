@@ -36,8 +36,8 @@
             </div>
             <label for="permalink" class="form-label"><i class="fas fa-link"></i>&nbsp;Permalink to this file:</label>
             <div class="input-group mb-3 shadow">
-                <input type="text" class="form-control" id="permalink" placeholder="Permalink" aria-label="PlzOpenMe Permalink">
-                <button class="btn btn-outline-primary" type="button" id="permalink-copy"><i class="fas fa-copy"></i>&nbsp;Copy</button>
+                <input type="text" class="form-control user-select-all" id="permalink" placeholder="Permalink" aria-label="PlzOpenMe Permalink" value="https://plzopen.me/File?id=@Model.Link.Link" readonly>
+                <button class="btn btn-outline-primary" type="button" id="permalink-copy" onclick="copyButtonClicked()"><i class="fas fa-copy"></i>&nbsp;Copy</button>
             </div>
         </div>
         <div class="col-md-4">
@@ -68,12 +68,48 @@
 {
     <!-- Video.js player script -->
     <script src="~/lib/videojs/dist/video.min.js"></script>
+    
+    <!-- enable tool tips -->
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+
+    <!-- initialize js objects-->
     <script>
         const videoPlayer = videojs('tme-animation', {
-                    controlBar: {
-                        'pictureInPictureToggle': false,
-                        'volumePanel': false,
-                    }
-                });
+            responsive: true,
+            playbackRates: [0.5, 1, 1.5, 2],
+            controlBar: {
+                'pictureInPictureToggle': false,
+                'volumePanel': false,
+                }
+        });
+        
+        const copyButton = document.getElementById("permalink-copy");
+        const copiedToolTip = new bootstrap.Tooltip(copyButton, {
+                boundary: document.body,
+                placement: 'top',
+                animation: true,
+                delay: 3000,
+                html: false,
+                trigger: 'manual',
+                fallbackPlacements: ['top', 'bottom', 'right', 'left'],
+                sanitize: true,
+                title: 'Copied!'
+            });      
+    </script>
+
+    <!-- copy the url button -->
+    <script>
+        function copyButtonClicked() {
+            var copyText = document.getElementById("permalink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+            document.execCommand("copy");
+            copiedToolTip.show();
+        } 
     </script>
 }

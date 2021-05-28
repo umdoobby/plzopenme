@@ -34,7 +34,7 @@
                     </video>
                 </div>
             </div>
-            <label for="permalink" class="form-label"><i class="fas fa-link"></i>&nbsp;Permalink to this file:</label>
+            <label for="permalink" class="form-label"><h5><i class="fas fa-link"></i>&nbsp;Permalink to this file:</h5></label>
             <div class="input-group mb-3 shadow">
                 <input type="text" class="form-control user-select-all" id="permalink" placeholder="Permalink" aria-label="PlzOpenMe Permalink" value="https://plzopen.me/File?id=@Model.Link.Link" readonly>
                 <button class="btn btn-outline-primary" type="button" id="permalink-copy" onclick="copyButtonClicked()"><i class="fas fa-copy"></i>&nbsp;Copy</button>
@@ -42,16 +42,18 @@
         </div>
         <div class="col-md-4">
             <div class="card border-success mb-3 shadow">
-                <div class="card-header"><i class="fas fa-clipboard-list"></i>&nbsp;File Details</div>
+                <div class="card-header"><h5><i class="fas fa-clipboard-list"></i>&nbsp;File Details</h5></div>
                 <div class="card-body small">
-                    <p class="card-text">Views: @Model.Link.Views</p>
-                    <p class="card-text">Uploaded: @Model.Link.AddedOn.ToString("R")</p>
-                    <p class="card-text">Entity: @Model.File.Type</p>
-                    <p class="card-text">MIME type: @Model.File.Mime</p>
-                    <p class="card-text">Size: @Model.File.Size Bytes</p>
-                    <p class="card-text">Height: @Model.Animation.Height px</p>
-                    <p class="card-text">Width: @Model.Animation.Width px</p>
-                    <p class="card-text">Duration: @Model.Animation.Duration Sec</p>
+                    <ul class="list-group card-text">
+                        <li class="list-group-item" aria-current="true">Views: @Model.Link.Views</li>
+                        <li class="list-group-item">Uploaded: @Model.Link.AddedOn.ToString("R")</li>
+                        <li class="list-group-item">Entity: @Model.File.Type</li>
+                        <li class="list-group-item">MIME type: @Model.File.Mime</li>
+                        <li class="list-group-item">Size: @Model.File.Size Bytes</li>
+                        <li class="list-group-item">Height: @Model.Animation.Height px</li>
+                        <li class="list-group-item">Width: @Model.Animation.Width px</li>
+                        <li class="list-group-item">Duration: @Model.Animation.Duration Sec</li>
+                    </ul>
                 </div>
             </div>
         </div>

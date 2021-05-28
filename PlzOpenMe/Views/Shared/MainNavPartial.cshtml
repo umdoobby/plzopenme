@@ -1,0 +1,48 @@
+﻿@model string
+
+<div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+            <span class="fs-4">PlzOpen.Me</span>
+        </a>
+
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]" aria-current="page"><i class="fas fa-home"></i>&nbsp;Home</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fas fa-id-badge"></i>&nbsp;About</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fas fa-bullhorn"></i>&nbsp;Get Started</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fab fa-git-alt"></i>&nbsp;Project</a></li>
+        </ul>
+    </div>
+</div>
+
+@{
+    string[] GetActiveLink()
+    {
+        string active = "active";
+        string normal = "";
+        
+        switch (Model.ToLower())
+        {
+            case ("home"):
+                return new string[4] {active, normal, normal, normal};
+                break;
+                
+            case ("about"):
+                return new string[4] {normal, active, normal, normal};
+                break;
+                    
+            case ("get started"):
+                return new string[4] {normal, normal, active, normal};
+                break;
+                
+            case("project"):
+                return new string[4] {normal, normal, normal, active};
+                break;
+                    
+            default:
+                return new string[4] {normal, normal, normal, normal};
+                break;
+        }
+    }
+}

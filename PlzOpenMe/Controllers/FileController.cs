@@ -162,6 +162,19 @@ namespace PlzOpenMe.Controllers
                     break;
                 
                 case "photo":
+                    // get the photo information
+                    var photoQuery = from pq in _dbContext.PomPhotos
+                        where pq.FileId == foundFile.Id
+                        select pq;
+                    
+                    // return the photo with all the information
+                    return View("Photo", new PhotoViewModel()
+                    {
+                        Photo = photoQuery.FirstOrDefault(),
+                        File = foundFile,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "sticker":

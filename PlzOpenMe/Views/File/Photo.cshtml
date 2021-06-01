@@ -1,11 +1,11 @@
-﻿@model AnimationViewModel
+﻿@model PhotoViewModel
 
 @{
     ViewBag.Title = Model.Link.Name;
     Layout = "_Layout";
-    ViewData["Description"] = "Delivery! I have an animation for you fresh from Telegram! Click here to view or download the file.";
-    ViewData["Thumbnail"] = $"data/{Model.ThumbFile.Location}";
-    ViewData["Url"] = $"file/{Model.Link.Link}";
+    ViewData["Description"] = "Delivery! I have a photo for you fresh from Telegram! Click here to view or download the file.";
+    ViewData["Thumbnail"] = $"~/data/{Model.ThumbFile.Location}";
+    ViewData["Url"] = $"~/file/{Model.Link.Link}";
 }
 
 <div class="container">
@@ -14,23 +14,8 @@
     <div class="row mb-3">
         <div class="col-md-8">
             <div class="card border-primary mb-3 shadow">
-                <div class="card-body vjs-fluid">
-                    <video
-                        id="tme-animation"
-                        class="video-js mx-auto shadow"
-                        controls
-                        loop
-                        muted
-                        responsive
-                        preload="auto"
-                        poster="/data/@Model.ThumbFile.Location"
-                        data-setup="{}">
-                        <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
-                        <p class="vjs-no-js">
-                            To view this video please enable JavaScript, and consider upgrading to a
-                            web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-                        </p>
-                    </video>
+                <div class="card-body">
+                    <img src="~/data/@Model.File.Location" alt="@Model.Link.Name" class="mx-auto" id="tme-photo"/>
                 </div>
                 <div class="card-footer small">
                     Uploaded: @Model.Link.AddedOn.ToString("R")
@@ -71,9 +56,8 @@
                     <li class="list-group-item">Entity: <span class="font-monospace">@Model.File.Type</span></li>
                     <li class="list-group-item">MIME type: <span class="font-monospace">@Model.File.Mime</span></li>
                     <li class="list-group-item">Size: <span class="font-monospace">@Model.File.Size Bytes</span></li>
-                    <li class="list-group-item">Height: <span class="font-monospace">@Model.Animation.Height.ToString()px</span></li>
-                    <li class="list-group-item">Width: <span class="font-monospace">@Model.Animation.Width.ToString()px</span></li>
-                    <li class="list-group-item">Duration: <span class="font-monospace">@Model.Animation.Duration Sec</span></li>
+                    <li class="list-group-item">Height: <span class="font-monospace">@Model.Photo.Height.ToString()px</span></li>
+                    <li class="list-group-item">Width: <span class="font-monospace">@Model.Photo.Width.ToString()px</span></li>
                 </ul>
             </div>
         </div>
@@ -83,13 +67,12 @@
 @section Css 
 {
     <!-- Video.js player style sheet -->
-    <link rel="stylesheet" href="~/lib/videojs/dist/video-js.min.css"/>
-    
-    <!-- Custom style -->
     <style>
-        #tme-animation {
-            max-width: @Model.Animation.Width.ToString()px;
-            max-height: @Model.Animation.Height.ToString()px;
+        #tme-photo {
+            max-height: @Model.Photo.Height.ToString()px;
+            max-width: @Model.Photo.Width.ToString()px;
+            height: auto;
+            width: auto;
         }
     </style>
 }
@@ -151,9 +134,6 @@
 
 @section Scripts
 {
-    <!-- Video.js player script -->
-    <script src="~/lib/videojs/dist/video.min.js"></script>
-    
     <!-- enable tool tips -->
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

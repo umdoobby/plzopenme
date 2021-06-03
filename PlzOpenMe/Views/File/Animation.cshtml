@@ -272,8 +272,8 @@
         } 
         
         function pauseAll() {
-            videoPlayer.pause().currentTime(0).trigger('loadstart');
-            videoPlayerOg.pause().currentTime(0).trigger('loadstart');
+            videoPlayer.reset();
+            videoPlayerOg.reset();
         }
     </script>
 }

@@ -156,9 +156,32 @@ namespace PlzOpenMe.Controllers
                     break;
                 
                 case "audio":
+                    // get the audio file information
+                    var audioQuery = from aq in _dbContext.PomAudios
+                        where aq.FileId == foundFile.Id
+                        select aq;
+                    
+                    // return the audio view with all in the information we need
+                    return View("Audio", new AudioViewModel()
+                    {
+                        Audio = audioQuery.FirstOrDefault(),
+                        File = foundFile,
+                        Link = foundLink,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "document":
+                    // there is no additional information needed for a document
+                    // return what we already have
+                    return View("Document", new DocumentViewModel()
+                    {
+                        File = foundFile,
+                        Link = foundLink,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "photo":
@@ -172,21 +195,76 @@ namespace PlzOpenMe.Controllers
                     {
                         Photo = photoQuery.FirstOrDefault(),
                         File = foundFile,
+                        Link = foundLink,
                         ThumbFile = thumbFile,
                         ThumbPhoto = thumbPhoto
                     });
                     break;
                 
                 case "sticker":
+                    // get the sticker information
+                    var stickerQuery = from sq in _dbContext.PomStickers
+                        where sq.FileId == foundFile.Id
+                        select sq;
+                    
+                    // return the sticker with all of the information we have
+                    return View("Sticker", new StickerViewModel()
+                    {
+                        File = foundFile,
+                        Sticker = stickerQuery.FirstOrDefault(),
+                        Link = foundLink,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "video":
+                    // get the video information
+                    var videoQuery = from vq in _dbContext.PomVideos
+                        where vq.FileId == foundFile.Id
+                        select vq;
+                    
+                    // return the video and all the information we have
+                    return View("Video", new VideoViewModel()
+                    {
+                        File = foundFile,
+                        Link = foundLink,
+                        Video = videoQuery.FirstOrDefault(),
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "videonote":
+                    // get the video note information
+                    var videoNoteQuery = from vq in _dbContext.PomVideoNotes
+                        where vq.FileId == foundFile.Id
+                        select vq;
+                    
+                    // return the video note view with all the information
+                    return View("VideoNote", new VideoNoteViewModel()
+                    {
+                        VideoNote = videoNoteQuery.FirstOrDefault(),
+                        File = foundFile,
+                        Link = foundLink,
+                        ThumbFile = thumbFile,
+                        ThumbPhoto = thumbPhoto
+                    });
                     break;
                 
                 case "voice":
+                    // get the voice recording information
+                    var voiceQuery = from vq in _dbContext.PomVoices
+                        where vq.FileId == foundFile.Id
+                        select vq;
+                    
+                    // return the view and all the information we need
+                    return View("Voice", new VoiceViewModel()
+                    {
+                        File = foundFile,
+                        Link = foundLink,
+                        Voice = voiceQuery.FirstOrDefault()
+                    });
                     break;
                 
                 default:

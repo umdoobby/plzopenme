@@ -739,7 +739,7 @@ namespace PlzOpenMe.Controllers
                             // we have a thumbnail, lets try to save that too
                             // these can be either a jpg or a webp, for right now we are just going to assume jpeg
                             temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
-                                updateMessage.Sticker.Thumb.FileSize, "image/jpg", "Thumbnail",
+                                updateMessage.Sticker.Thumb.FileSize, "image/sticker", "Thumbnail",
                                 updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file

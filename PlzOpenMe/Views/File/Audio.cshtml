@@ -1,0 +1,11 @@
+﻿@model AudioViewModel
+
+@{
+    ViewBag.Title = Model.Link.Name;
+    Layout = "_Layout";
+    ViewData["Description"] = "Delivery! I have an audio file for you fresh from Telegram! Click here to view or download the file.";
+    ViewData["Thumbnail"] = $"data/{Model.ThumbFile.Location}";
+    ViewData["Url"] = $"file/{Model.Link.Link}";
+}
+
+<h2>title</h2>

@@ -1,0 +1,11 @@
+﻿@model VoiceViewModel
+
+@{
+    ViewBag.Title = Model.Link.Name;
+    Layout = "_Layout";
+    ViewData["Description"] = "Delivery! I have a voice recording for you fresh from Telegram! Click here to view or download the file.";
+    ViewData["Thumbnail"] = $"img/voiceThumbnail.png";
+    ViewData["Url"] = $"file/{Model.Link.Link}";
+}
+
+<h2>title</h2>

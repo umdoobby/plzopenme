@@ -8,18 +8,18 @@
         </a>
 
         <ul class="nav nav-pills">
-            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]" aria-current="page"><i class="fas fa-home"></i>&nbsp;Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fas fa-id-badge"></i>&nbsp;About</a></li>
-            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fas fa-bullhorn"></i>&nbsp;Get Started</a></li>
-            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink()[0]"><i class="fab fa-git-alt"></i>&nbsp;Project</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink("active")[0]" aria-current="@GetActiveLink("page")[0]"><i class="fas fa-home"></i>&nbsp;Home</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink("active")[1]" aria-current="@GetActiveLink("page")[0]"><i class="fas fa-id-badge"></i>&nbsp;About</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink("active")[2]" aria-current="@GetActiveLink("page")[0]"><i class="fas fa-bullhorn"></i>&nbsp;Get Started</a></li>
+            <li class="nav-item"><a href="#" class="nav-link @GetActiveLink("active")[3]" aria-current="@GetActiveLink("page")[0]"><i class="fab fa-git-alt"></i>&nbsp;Project</a></li>
         </ul>
     </div>
 </div>
 
 @{
-    string[] GetActiveLink()
+    string[] GetActiveLink(string activeText)
     {
-        string active = "active";
+        string active = activeText;
         string normal = "";
         
         switch (Model.ToLower())

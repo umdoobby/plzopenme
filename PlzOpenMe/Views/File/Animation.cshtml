@@ -226,6 +226,15 @@
                 }
         });
         
+        const videoPlayerOg = videojs('tme-animation-original', {
+            responsive: true,
+            playbackRates: [0.5, 1, 1.5, 2],
+            controlBar: {
+                'pictureInPictureToggle': false,
+                'volumePanel': false,
+                }
+        });
+        
         const viewer = new Viewer(document.getElementById("tme-thumbnail"), {
           inline: true,
           viewed() {

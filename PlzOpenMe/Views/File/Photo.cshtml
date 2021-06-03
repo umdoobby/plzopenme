@@ -28,12 +28,12 @@
                     <div id="playerTabs" class="tab-content">
                         <div class="tab-pane fade active show" id="originalSize">
                             <div class="d-flex justify-content-center">
-                                <img id="tme-photo" class="img-fluid mx-auto" src="/data/@Model.File.Location" alt="@Model.Link.Name" />
+                                <img id="tme-photo" class="img-fluid mx-auto shadow" src="/data/@Model.File.Location" alt="@Model.Link.Name" />
                             </div>
                         </div>
                         <div class="tab-pane fade" id="thumbnailViewer">
                             <div class="d-flex justify-content-center">
-                                <img id="tme-thumbnail" class="img-thumbnail mx-auto" src="/data/@Model.ThumbFile.Location" alt="@Model.Link.Name Thumbnail" />
+                                <img id="tme-thumbnail" class="img-thumbnail mx-auto shadow" src="/data/@Model.ThumbFile.Location" alt="@Model.Link.Name Thumbnail" />
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                     <li class="list-group-item">Entity: <span class="font-monospace">@Model.File.Type</span></li>
                     <li class="list-group-item">MIME type: <span class="font-monospace">@Model.File.Mime</span></li>
                     <li class="list-group-item">Size: <span class="font-monospace">@Model.File.Size Bytes</span></li>
-                    <li class="list-group-item">Thumbnail: <span class="font-monospace">@Model.Photo.IsThumbnail.ToString() Bytes</span></li>
+                    <li class="list-group-item">Thumbnail: <span class="font-monospace">@Model.Photo.IsThumbnail.ToString()</span></li>
                 </ul>
             </div>
         </div>
@@ -96,11 +96,15 @@
         #tme-photo {
             max-width: @Model.Photo.Width.ToString()px;
             max-height: @Model.Photo.Height.ToString()px;
+            width: 100%;
+            height: 100%;
         }
         
         #tme-thumbnail {
             max-width: @Model.ThumbPhoto.Height.ToString()px;
             max-height: @Model.ThumbPhoto.Height.ToString()px;
+            width: 100%;
+            height: 100%;
         }
     </style>
 }

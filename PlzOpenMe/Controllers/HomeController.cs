@@ -33,6 +33,21 @@ namespace PlzOpenMe.Controllers
             return View("TermsOfService");
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        public IActionResult GettingStarted()
+        {
+            return View();
+        }
+
+        public IActionResult Project()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

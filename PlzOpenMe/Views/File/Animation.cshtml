@@ -98,7 +98,9 @@
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         <button class="btn btn-lg btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalShare"><i class="fas fa-share-alt"></i>&nbsp;Share</button>
-                        <button class="btn btn-lg btn-primary" type="button"><i class="fas fa-download"></i>&nbsp;Download</button>
+                        <a class="text-reset btn btn-lg btn-primary" type="button" href="/data/@Model.File.Location" download="@Model.Link.Name">
+                            <i class="fas fa-download"></i>&nbsp;Download
+                        </a>
                         <div class="d-flex justify-content-end">
                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalReport"><i class="fas fa-flag"></i>&nbsp;Report</button>
                         </div>
@@ -270,8 +272,8 @@
         } 
         
         function pauseAll() {
-            videoPlayer.pause();
-            videoPlayerOg.pause();
+            videoPlayer[0].pause();
+            videoPlayerOg[0].pause();
         }
     </script>
 }

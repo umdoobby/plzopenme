@@ -16,13 +16,13 @@
             <div class="card border-primary mb-3 shadow">
                 <div class="card-header">
                     <ul class="nav nav-pills small">
-                        <li class="nav-item">
+                        <li class="nav-item" onclick="pauseAll()">
                             <a class="nav-link active" data-bs-toggle="tab" href="#mainViewer">Best Fit</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" onclick="pauseAll()">
                             <a class="nav-link" data-bs-toggle="tab" href="#originalSize">Original</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" onclick="pauseAll()">
                             <a class="nav-link" data-bs-toggle="tab" href="#thumbnailViewer">Thumbnail</a>
                         </li>
                     </ul>
@@ -203,10 +203,10 @@
 {
     <!-- Video.js player script -->
     <script src="~/lib/videojs/dist/video.min.js"></script>
-    
+
     <!-- Viewer.js script -->
     <script src="~/lib/viewerjs/dist/viewer.min.js"></script>
-    
+
     <!-- enable tool tips -->
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -256,7 +256,7 @@
             });      
     </script>
 
-    <!-- copy the url button -->
+    <!-- button functions -->
     <script>
         function copyButtonClicked() {
             var copyText = document.getElementById("permalink");
@@ -268,5 +268,10 @@
                     copiedToolTip.hide();
                 }, 3000);
         } 
+        
+        function pauseAll() {
+            videoPlayer.pause();
+            videoPlayerOg.pause();
+        }
     </script>
 }

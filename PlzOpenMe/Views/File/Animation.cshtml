@@ -9,13 +9,13 @@
 }
 
 <div class="container">
-    <h2>@Model.Link.Name</h2>
+    <h2 class="text-wrap text-break">@Model.Link.Name</h2>
     <hr class="border-primary mb-3" />
     <div class="row mb-3">
         <div class="col-md-8">
             <div class="card border-primary mb-3 shadow">
                 <div class="card-header">
-                    <ul class="nav nav-pills small">
+                    <ul class="nav nav-pills card-header-pills small">
                         <li class="nav-item" onclick="pauseAll()">
                             <a class="nav-link active" data-bs-toggle="tab" href="#mainViewer">Best Fit</a>
                         </li>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="tab-pane fade" id="thumbnailViewer">
                             <div class="d-flex justify-content-center">
-                                <img id="tme-thumbnail" class="img-thumbnail mx-auto" src="/data/@Model.ThumbFile.Location" alt="@Model.Link.Name Thumbnail" />
+                                <img id="tme-thumbnail" class="img-thumbnail mx-auto shadow" src="/data/@Model.ThumbFile.Location" alt="@Model.Link.Name Thumbnail" />
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
             <div class="card border-secondary mb-3 fs-6 shadow">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><h6 class="m-0"><i class="fas fa-eye"></i>&nbsp;Views</h6></div>
-                    <span class="badge bg-primary rounded-pill">@Model.Link.Views</span>
+                    <span class="badge bg-primary rounded-pill shadow">@Model.Link.Views</span>
                 </div>
             </div>
             <div class="card border-warning mb-3 shadow">
@@ -97,12 +97,12 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <button class="btn btn-lg btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalShare"><i class="fas fa-share-alt"></i>&nbsp;Share</button>
-                        <a class="btn btn-lg btn-primary" type="button" href="/data/@Model.File.Location" download="@Model.Link.Name">
+                        <button class="btn btn-lg btn-success shadow" type="button" data-bs-toggle="modal" data-bs-target="#modalShare"><i class="fas fa-share-alt"></i>&nbsp;Share</button>
+                        <a class="btn btn-lg btn-primary shadow" type="button" href="/data/@Model.File.Location" download="@Model.Link.Name">
                             <i class="fas fa-download"></i>&nbsp;Download
                         </a>
                         <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalReport"><i class="fas fa-flag"></i>&nbsp;Report</button>
+                            <button type="button" class="btn btn-danger btn-sm shadow" data-bs-toggle="modal" data-bs-target="#modalReport"><i class="fas fa-flag"></i>&nbsp;Report</button>
                         </div>
                     </div>
                 </div>

@@ -7,7 +7,6 @@ using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualBasic;
 using nClam;
 using PlzOpenMe.Models;
 using Serilog;
@@ -146,7 +145,7 @@ namespace PlzOpenMe.Controllers
                         "Respond with \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
                         "privacy policy and terms of service. If you do not agree, respond with \"Stop\" and I will " +
                         "delete any information I have collected about your Telegram account.",
-                        ParseMode.Default,false,false,0,
+                        ParseMode.Default,null,false,false, 0, false,
                         new ReplyKeyboardMarkup(replyOptions, true, true));
                     return Json(true);
                 }
@@ -265,7 +264,7 @@ namespace PlzOpenMe.Controllers
                         "Select \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
                         "privacy policy and terms of service. If you do not agree, choose \"Stop\" and I " +
                         "will delete any information I have collected about your Telegram account from my database.",
-                        ParseMode.Default,false,false,0,
+                        ParseMode.Default,null,false,false, 0, false,
                         new ReplyKeyboardMarkup(replyOptions, true, true));
                     return Json(true);
                 }
@@ -365,7 +364,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -421,7 +420,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -447,7 +446,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
 
@@ -503,7 +502,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -529,7 +528,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -576,7 +575,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -626,7 +625,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -682,7 +681,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -708,7 +707,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -771,7 +770,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -786,7 +785,7 @@ namespace PlzOpenMe.Controllers
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Video.FileId, updateMessage.Video.FileUniqueId,
                             updateMessage.Video.FileSize, updateMessage.Video.MimeType, "Video",
-                            "", updateFrom.Id);
+                            updateMessage.Video.FileName, updateFrom.Id);
 
                         // see if we actually saved the file
                         if (temp == null)
@@ -797,7 +796,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -853,7 +852,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -879,7 +878,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -934,7 +933,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -960,7 +959,7 @@ namespace PlzOpenMe.Controllers
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                                 $"Sorry but there was an error while attempting to save this file. " +
                                 $"Likely, either the file was too large for Telegram to let me download it or the file failed my virus scan.",
-                                ParseMode.Default, false, false, updateMessage.MessageId);
+                                ParseMode.Default, null, false, false, updateMessage.MessageId);
                             return Json(false);
                         }
                         
@@ -988,7 +987,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry but there was a fatal error while trying to save that file. " +
                             $"Please report this issue at https://github.com/umdoobby/plzopenme and try again later!",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 }
@@ -1023,7 +1022,7 @@ namespace PlzOpenMe.Controllers
                         // send the success message
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"{_configuration.GetValue<string>("LiveUrl")}File?id={newLink.Link}",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(true);
                     }
                     catch (Exception ex)
@@ -1036,7 +1035,7 @@ namespace PlzOpenMe.Controllers
                         _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                             $"Sorry, there was an unexpected error while trying to create the link. " +
                             $"Please consider reporting this issue here, https://github.com/umdoobby/plzopenme and try again later.",
-                            ParseMode.Default, false, false, updateMessage.MessageId);
+                            ParseMode.Default, null, false, false, updateMessage.MessageId);
                         return Json(false);
                     }
                 
@@ -1045,7 +1044,7 @@ namespace PlzOpenMe.Controllers
                 // placeholder response
                 _bot.SendTextMessageAsync(updateMessage.Chat.Id,
                     $"Sorry but there doesn't seem to be any files attached to that message.",
-                    ParseMode.Default, false, false, updateMessage.MessageId);
+                    ParseMode.Default, null, false, false, updateMessage.MessageId);
                 return Json(true);
             }
 

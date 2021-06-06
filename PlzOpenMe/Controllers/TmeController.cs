@@ -866,7 +866,7 @@ namespace PlzOpenMe.Controllers
                         
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.VideoNote.FileId, updateMessage.VideoNote.FileUniqueId,
-                            updateMessage.VideoNote.FileSize, "video/note", "VideoNote",
+                            updateMessage.VideoNote.FileSize, "video/mp4", "VideoNote",
                             DateTime.Now.ToString("O"), updateFrom.Id);
 
                         // see if we actually saved the file

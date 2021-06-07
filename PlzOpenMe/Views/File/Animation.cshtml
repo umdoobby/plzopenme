@@ -49,23 +49,25 @@
                             </video>
                         </div>
                         <div class="tab-pane fade" id="originalSize">
-                            <video
-                                id="tme-animation-original"
-                                class="video-js mx-auto shadow"
-                                controls
-                                loop
-                                muted
-                                preload="auto"
-                                height="@Model.Animation.Height"
-                                width="@Model.Animation.Width"
-                                poster="/data/@Model.ThumbFile.Location"
-                                data-setup="">
-                                <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
-                                <p class="vjs-no-js">
-                                    To view this video please enable JavaScript, and consider upgrading to a
-                                    web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-                                </p>
-                            </video>
+                            <div class="container" id="tme-original-container">
+                                <video
+                                    id="tme-animation-original"
+                                    class="video-js mx-auto shadow"
+                                    controls
+                                    loop
+                                    muted
+                                    preload="auto"
+                                    height="@Model.Animation.Height"
+                                    width="@Model.Animation.Width"
+                                    poster="/data/@Model.ThumbFile.Location"
+                                    data-setup='{"fluid": true}'>
+                                    <source src="/data/@Model.File.Location" type="@Model.File.Mime"/>
+                                    <p class="vjs-no-js">
+                                        To view this video please enable JavaScript, and consider upgrading to a
+                                        web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+                                    </p>
+                                </video>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="thumbnailViewer">
                             <div class="d-flex justify-content-center">
@@ -127,13 +129,20 @@
 @section Css
 {
     <!-- Video.js player style sheet -->
-    <link rel="stylesheet" href="~/lib/videojs/dist/video-js.min.css" />
-    
+    <link rel="stylesheet" href="~/lib/videojs/dist/video-js.min.css"/>
+
     <!-- Viewer.js style sheet -->
-    <link rel="stylesheet" href="~/lib/viewerjs/dist/viewer.min.css" />
+    <link rel="stylesheet" href="~/lib/viewerjs/dist/viewer.min.css"/>
 
     <!-- Custom style -->
     <style>
+        #tme-original-container {
+            width: auto;
+            height: auto;
+            max-width: @Model.Animation.Width.ToString()px !important;
+            max-height: @Model.Animation.Height.ToString()px !important;
+        }
+    
         #tme-animation-original {
             max-width: @Model.Animation.Width.ToString()px;
             max-height: @Model.Animation.Height.ToString()px;

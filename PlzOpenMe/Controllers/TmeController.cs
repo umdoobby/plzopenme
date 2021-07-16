@@ -522,7 +522,7 @@ namespace PlzOpenMe.Controllers
                         // see if we actually saved the file
                         if (temp == null)
                         {
-                            Log.Warning($"Failed to save an audio file for user {updateFrom.Id} file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
+                            Log.Warning($"Failed to save a document file for user {updateFrom.Id} file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
 
                             // we failed to upload the file
                             _bot.SendTextMessageAsync(updateMessage.Chat.Id,
@@ -695,7 +695,7 @@ namespace PlzOpenMe.Controllers
                         
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Sticker.FileId, updateMessage.Sticker.FileUniqueId,
-                            updateMessage.Sticker.FileSize, "image/sticker", "Sticker",
+                            updateMessage.Sticker.FileSize, "", "Sticker",
                             updateMessage.Sticker.SetName + " | " + updateMessage.Sticker.Emoji, updateFrom.Id);
 
                         // see if we actually saved the file
@@ -738,7 +738,7 @@ namespace PlzOpenMe.Controllers
                             // we have a thumbnail, lets try to save that too
                             // these can be either a jpg or a webp, for right now we are just going to assume jpeg
                             temp = SaveOrFindFile(updateMessage.Sticker.Thumb.FileId, updateMessage.Sticker.Thumb.FileUniqueId,
-                                updateMessage.Sticker.Thumb.FileSize, "image/sticker", "Thumbnail",
+                                updateMessage.Sticker.Thumb.FileSize, "", "Thumbnail",
                                 updateMessage.Sticker.SetName + "|" + updateMessage.Sticker.Emoji + "-thumb", updateFrom.Id);
                             
                             // see if we actually saved the file
@@ -1361,10 +1361,16 @@ namespace PlzOpenMe.Controllers
                     if (Downloadfile(newFile.Location, filePath, newFile.Size))
                     {
                         // we saved the file
+                        // if the mimetype is empty we want to try and get it from the file
+                        if (String.IsNullOrWhiteSpace(newFile.Mime))
+                        {
+                            mimeType = MimeTypes.GetMimeType(newFile.Location);
+                        }
+
                         _dbContext.Add(newFile);
                         int dbSave = _dbContext.SaveChanges();
                         Log.Information(
-                            $"User {fromId} uploaded the audio file {fileUniqueId} as {newFile.Location} with result {dbSave}");
+                            $"User {fromId} uploaded the {newFile.Type} file {fileUniqueId} as {newFile.Location} with result {dbSave}");
                     }
                     else
                     {

@@ -21,6 +21,7 @@ namespace PlzOpenMe
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            EmailSender.Init(configuration);
         }
 
         public IConfiguration Configuration { get; }
@@ -30,7 +31,7 @@ namespace PlzOpenMe
         {
             // create the configuration service
             services.AddSingleton<IConfiguration>(Configuration);
-            
+
             // create the database service
             services.AddDbContext<PlzOpenMeContext>(builder => builder
                 .UseMySql(Configuration.GetConnectionString("MainDatabase"),

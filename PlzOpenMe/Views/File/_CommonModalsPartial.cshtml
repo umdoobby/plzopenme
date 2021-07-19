@@ -1,0 +1,52 @@
+﻿@model PomFile
+
+<!-- Share modal -->
+<div class="modal fade" id="modalShare" tabindex="-1" aria-labelledby="modalShareLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalShareLabel"><i class="fas fa-share-alt"></i>&nbsp;Pass it on!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalShareContent" class="container">
+                    <div class="d-flex justify-content-center">
+                        <h2><i class="fas fa-spinner fa-pulse"></i></h2>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        Working on it...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-thumbs-up"></i>&nbsp;Thanks!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report modal -->
+<div class="modal fade" id="modalReport" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalReportLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReportLabel"><i class="fas fa-flag"></i>&nbsp;Report this file</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalReportContent" class="container">
+                    <div class="d-flex justify-content-center">
+                        <h2><i class="fas fa-spinner fa-pulse"></i></h2>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        Hang on a sec...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" disabled><i class="fas fa-paper-plane"></i>&nbsp;Submit Report</button>
+            </div>
+        </div>
+    </div>
+</div>

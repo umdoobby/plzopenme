@@ -38,14 +38,7 @@ namespace PlzOpenMe
                 throw new Exception("EmailSender is not initialized");
             }
             
-            // Create the email client
-            MailMessage mailMessage = new MailMessage()
-            {
-                From = new MailAddress(FromAddress),
-                Body = message,
-                Subject = subject,
-                To = new MailAddressCollection().
-            }
+            // TODO: actually make this send an email
         }
     }
 }

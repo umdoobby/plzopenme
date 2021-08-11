@@ -145,8 +145,8 @@ namespace PlzOpenMe.Controllers
                         "Respond with \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
                         "privacy policy and terms of service. If you do not agree, respond with \"Stop\" and I will " +
                         "delete any information I have collected about your Telegram account.",
-                        ParseMode.Default,null,false,false, 0, false,
-                        new ReplyKeyboardMarkup(replyOptions, true, true));
+                        ParseMode.Html,null,false,false, 0, false,
+                        new ReplyKeyboardMarkup(replyOptions));
                     return Json(true);
                 }
 
@@ -264,8 +264,8 @@ namespace PlzOpenMe.Controllers
                         "Select \"I agree\" to say that you have read, understand, and agree to the PlzOpen.Me " +
                         "privacy policy and terms of service. If you do not agree, choose \"Stop\" and I " +
                         "will delete any information I have collected about your Telegram account from my database.",
-                        ParseMode.Default,null,false,false, 0, false,
-                        new ReplyKeyboardMarkup(replyOptions, true, true));
+                        ParseMode.Html,null,false,false, 0, false,
+                        new ReplyKeyboardMarkup(replyOptions));
                     return Json(true);
                 }
 
@@ -512,7 +512,7 @@ namespace PlzOpenMe.Controllers
                 {
                     try
                     {
-                        Log.Debug($"User {updateFrom.Id} submitted an audio file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
+                        Log.Debug($"User {updateFrom.Id} submitted a document file ID={updateMessage.Document.FileId} FuID={updateMessage.Document.FileUniqueId}");
                         
                         // attempt to save the file
                         UploadedFile temp = SaveOrFindFile(updateMessage.Document.FileId, updateMessage.Document.FileUniqueId,
